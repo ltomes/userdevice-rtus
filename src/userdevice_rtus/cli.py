@@ -23,13 +23,39 @@ def _run(module: str) -> None:
 
 def train() -> None:
     """Train a config. Requires traiNNer, and fails loudly without it."""
+    import os
+    from pathlib import Path
+
     from userdevice_rtus import require_real_registry
 
     # Importing the package registers the architectures; this check turns a
     # silent "unknown architecture" much later into an immediate, explained
     # failure here.
     require_real_registry()
-    runpy.run_module("traiNNer.train", run_name="__main__")
+
+    # traiNNer's entry point is train.py at the REPO ROOT, outside the
+    # `traiNNer` package -- so there is no `traiNNer.train` module to run.
+    # Locate it relative to the installed package instead of hardcoding a
+    # path, so this works for any checkout location.
+    import traiNNer
+
+    root = Path(traiNNer.__file__).resolve().parent.parent
+    script = root / "train.py"
+    if not script.is_file():
+        raise FileNotFoundError(
+            f"traiNNer's train.py not found at {script}. Expected it beside "
+            f"the traiNNer package (its repository root)."
+        )
+
+    # Upstream is an application: train.py resolves experiment directories
+    # relative to the working directory, and traiNNer imports its own
+    # top-level `scripts` package. Both only work when you are standing in the
+    # repo root with it importable, which is what running it as an application
+    # normally gives you.
+    os.chdir(root)
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    runpy.run_path(str(script), run_name="__main__")
 
 
 def evaluate() -> None:

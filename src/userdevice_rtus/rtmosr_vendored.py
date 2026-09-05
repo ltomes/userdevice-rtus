@@ -5,7 +5,7 @@ import torch.nn.functional as F  # noqa: N812
 from torch import Tensor, nn
 from torch.nn.init import trunc_normal_
 
-from userdevice_rtus._registry import ARCH_REGISTRY
+
 
 
 class CSELayer(nn.Module):
@@ -386,7 +386,9 @@ class GatedCNNBlock(nn.Module):
         return x + shortcut
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 class RTMoSR(nn.Module):
     def __init__(
         self,
@@ -450,7 +452,9 @@ class RTMoSR(nn.Module):
         ] + F.interpolate(x, scale_factor=self.scale)
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 def rtmosr_l(
     scale: int = 2,
     dim: int = 32,
@@ -471,7 +475,9 @@ def rtmosr_l(
     )
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 def rtmosr_ul(
     scale: int = 2,
     dim: int = 32,

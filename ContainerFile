@@ -38,11 +38,11 @@ RUN uv pip install --python "$(command -v python)" --break-system-packages --no-
     && uv pip install --python "$(command -v python)" --break-system-packages --no-cache \
          safetensors spandrel onnx onnxscript onnxruntime
 
-# NOTE: a NON-editable install of traiNNer-redux ships an EMPTY `traiNNer`
-# package. Upstream sets `include = ["traiNNer"]` in its setuptools package
-# discovery, which matches the top-level package but none of its subpackages
-# (traiNNer.utils, traiNNer.archs, ...). Installing it EDITABLE resolves
-# imports from the source tree and sidesteps that upstream bug.
+# traiNNer-redux is distributed as an APPLICATION you clone and run, not as a
+# library: its pyproject declares dependencies and no console entry points, and
+# its package discovery is scoped accordingly. A plain install therefore gives
+# you an empty `traiNNer` package. Installing it EDITABLE is the supported way
+# to make an application source tree importable, which is what we need.
 
 # Fail the build if the package cannot import or the architectures did not
 # register. Catching that here is the entire point of the registry shim: a

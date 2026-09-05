@@ -9,7 +9,7 @@ DySample = None  # stubbed: pixelshuffle only
 from torch import Tensor, nn
 from torch.nn.init import trunc_normal_
 
-from userdevice_rtus._registry import ARCH_REGISTRY
+
 
 
 class LayerNorm(nn.Module):
@@ -184,7 +184,9 @@ class RealPLKSR(nn.Module):
         return self.to_img(x)
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 def realplksr(
     in_ch: int = 3,
     out_ch: int = 3,
@@ -217,7 +219,9 @@ def realplksr(
     )
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 def realplksr_tiny(
     in_ch: int = 3,
     out_ch: int = 3,
@@ -250,7 +254,9 @@ def realplksr_tiny(
     )
 
 
-@ARCH_REGISTRY.register()
+# NOT registered: traiNNer-redux ships its own rtmosr_arch.py / realplksr_arch.py
+# registering these same names, and its registry rejects duplicates. This file
+# exists as the definition RTMoSREA builds on, not as a competing arch.
 def realplksr_large(
     in_ch: int = 3,
     out_ch: int = 3,
