@@ -180,8 +180,9 @@ Notes:
 Training data, checkpoints, ONNX exports and TensorRT engines are all
 gitignored: this repository holds the code that produces weights, never the
 weights themselves. Released weights are to be published separately as a
-Hugging Face model repository, each release citing the commit it was trained
-from. No release has been published yet.
+Hugging Face model repository under
+[huggingface.co/ltomes](https://huggingface.co/ltomes), each release citing
+the commit it was trained from. No release has been published yet.
 
 ## Provenance, licence and attribution
 
@@ -191,6 +192,13 @@ notices are in the same file, for
 [neosr](https://github.com/neosr-project/neosr) and
 [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
 (both Apache-2.0).
+
+**Released model weights are [CC BY-SA
+4.0](https://creativecommons.org/licenses/by-sa/4.0/)** — usable and
+modifiable, including commercially, provided you attribute and license
+redistributed derivatives of the weights the same way. The code licence and
+the weights licence are deliberately different; the weights are not
+distributed from this repository.
 
 The released models are **distilled from
 [`4xNomosWebPhoto_RealPLKSR`](https://huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR)

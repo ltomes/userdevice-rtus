@@ -21,6 +21,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ================================================================================
+RELEASED MODEL WEIGHTS — CC BY-SA 4.0
+================================================================================
+
+The MIT License above covers the CODE in this repository. It does not cover
+the model weights, which are not distributed here.
+
+Released model weights — checkpoints, ONNX exports and any TensorRT engines
+published under the userdevice-rtus name — are licensed under Creative
+Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
+https://creativecommons.org/licenses/by-sa/4.0/
+
+In short: they may be used, modified and redistributed, including
+commercially, provided that attribution is given and that redistributed
+derivatives of the weights carry the same licence.
+
+This does not displace the teacher's attribution requirement recorded under
+THIRD-PARTY NOTICES below: the weights are distilled from
+4xNomosWebPhoto_RealPLKSR (CC BY 4.0, Philip Hofmann), and that credit must
+travel with them.
+
+================================================================================
 THIRD-PARTY NOTICES
 ================================================================================
 

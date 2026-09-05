@@ -107,6 +107,24 @@ third-party pretrained checkpoint. Its configs were removed from this
 repository so the two lineages cannot be confused. If that line is ever
 revived, its weight origin must be resolved first.
 
+## What we license the weights under
+
+**CC BY-SA 4.0**, decided by the operator on 2026-09-05. Their words, quoted
+because the standing rule at the foot of this file requires it: *"Set
+CC-BY-SA-4.0. I have to have something set before its public so why not."*
+
+Written into `LICENSE` under RELEASED MODEL WEIGHTS. It covers released
+checkpoints, ONNX exports and any TensorRT engines — not the code in this
+repository, which stays MIT.
+
+It adds to the obligations below rather than replacing them: share-alike
+applies to our weights, and the teacher's CC-BY-4.0 attribution requirement
+still travels with them.
+
+Weights are released to the operator's Hugging Face account,
+[huggingface.co/ltomes](https://huggingface.co/ltomes). There is no
+organisation account.
+
 ## Obligations this creates for a release
 
 1. **Attribute Philip Hofmann** for `4xNomosWebPhoto_RealPLKSR`, as CC-BY-4.0
@@ -115,6 +133,8 @@ revived, its weight origin must be resolved first.
 2. **Carry the MIT notice** for RTMoSR (rewaifu) with the architecture code.
 3. **Carry Apache-2.0 attribution** for traiNNer-redux and neosr.
 4. State the Nomos-v2 lineage of the corpus, even though no images ship.
+5. **Declare CC BY-SA 4.0 on the weights**, and carry it on the model card
+   alongside the teacher attribution above.
 
 ## Standing rule
 
