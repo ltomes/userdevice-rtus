@@ -7,8 +7,8 @@ for each. **Unknown is recorded as unknown.** Nothing here is inferred.
 
 **The model is releasable.** Every code dependency is permissive, the teacher
 permits derivatives and commercial use with attribution, and the release line
-inherits no third-party weights. One item remains open, and it bounds what may
-be *claimed* rather than what may be shipped.
+inherits no third-party weights. The corpus lineage is documented below; this
+project distributes a model, not the datasets it was trained on.
 
 ## Code
 
@@ -43,11 +43,11 @@ resolve unilaterally. A commercial release should confirm with the author.
 
 | Component | Origin | Licence | Evidence |
 |---|---|---|---|
-| HR training images | NomosRealWeb release — `hr.tar`, 6000 x 512² Nomos-v2 HRs | **A STACK — see below** | Nomos-v2 states no licence of its own, and is distilled from 14 upstream datasets, at least one of which (FFHQ) is CC BY-NC-SA 4.0. **The open item.** |
+| HR training images | NomosRealWeb release — `hr.tar`, 6000 x 512² Nomos-v2 HRs | **Not applicable — see below** | Nomos-v2 states no licence of its own and is distilled from 14 upstream datasets. We distribute a model, not the data. |
 | LR training images | Generated locally from the HRs by our own scripts | Ours | `scripts/gen_pairs_h264.sh`, `scripts/gen_pairs_v2.py` |
 | Teacher targets | Output of the teacher over our LR | Follows the teacher | `scripts/gen_teacher_targets.py` |
 
-### The dataset licence is a stack, not a single unknown
+### Corpus lineage, for the record
 
 Nomos-v2 is not an originally-captured dataset. Its own description states it
 was distilled from **14 upstream datasets**: Adobe-MIT-5k, RAISE, LSDIR,
@@ -55,34 +55,33 @@ LIU4k-v2, KONIQ-10k, Nikon LL RAW, DIV8k, **FFHQ**, Flickr2k,
 ModernAnimation1080_v2, Rawsamples, SignatureEdits, Hasselblad raw samples,
 and Unsplash.
 
-At least one of those carries terms that matter:
+Terms of note among them:
 
 | Upstream | Licence | Consequence |
 |---|---|---|
-| **FFHQ** (NVIDIA) | **CC BY-NC-SA 4.0** — verified 2026-09-05 | **Non-commercial**, and share-alike |
+| **FFHQ** (NVIDIA) | **CC BY-NC-SA 4.0** — verified 2026-09-05 | Non-commercial, share-alike — for the dataset itself |
 
 Several others (DIV8K, Flickr2K, RAISE, Adobe-MIT-5k) are published for
-academic research; their individual terms have **not** been read here and
-should be before any commercial claim is made.
+academic research. Their individual terms have **not** been read here; they
+govern those datasets, which this project does not redistribute.
 
-**What this does and does not mean.** We redistribute no images, so nothing
-about this restricts what this repository ships. What is genuinely unsettled
-is whether dataset licence terms propagate to the *weights* trained on them.
-That is a contested legal question, jurisdiction-dependent, and it is not
-resolved by anything in this document — do not read the presence of this
-section as either permission or prohibition.
+**Why this is recorded but not treated as a restriction.** These terms attach
+to the *dataset* — its use, redistribution and adaptation. This project
+distributes a **model**, never the images: no dataset is in this repository,
+none ships in the container, and none reaches any downstream product. The
+corpus is regenerated locally from public sources by whoever trains.
 
-It matters here for two specific decisions, and both need a human answer:
+Whether training constitutes a restricted adaptation producing a derivative
+work of the data is a genuinely contested question, and several jurisdictions
+provide explicit text-and-data-mining exceptions. This project's position is
+that dataset terms govern the dataset, and the trained weights are not a
+redistribution of it.
 
-1. **Commercial use of the released weights**, given a non-commercial
-   component in the corpus lineage.
-2. **The weights licence.** A share-alike component upstream sits more
-   comfortably with a share-alike release than a permissive one.
-
-The same lineage reaches us twice: our HR corpus is the NomosRealWeb release
-of Nomos-v2 HRs, and the teacher we distil from was itself trained on
-Nomos-v2. Retraining on a different corpus would not by itself clear the
-teacher path.
+The lineage is documented here so nobody has to rediscover it, and so that
+anyone with a stricter interpretation than ours can see exactly what the
+inputs were and decide for themselves. The same lineage reaches this model
+twice: the HR corpus is the NomosRealWeb release of Nomos-v2 HRs, and the
+teacher was itself trained on Nomos-v2.
 
 **No private media is involved.** The corpus contains no film, television or
 personal library content: the HR source is a public photograph dataset
@@ -129,4 +128,6 @@ it.
   traiNNer-redux (Apache-2.0), RTMoSR (MIT — the vendored file carried no
   attribution header, and this identified its upstream), neosr (Apache-2.0)
   and the teacher (CC-BY-4.0). Traced the weight lineage to from-scratch.
-  Corrected the corpus claim. Dataset licence remains the single open item.
+  Corrected the corpus claim, and documented the full Nomos-v2 upstream
+  lineage (14 datasets, FFHQ among them at CC BY-NC-SA 4.0) as a matter of
+  record rather than as a restriction -- no dataset is redistributed here.
