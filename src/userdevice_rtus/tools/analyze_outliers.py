@@ -16,7 +16,7 @@ Consumes the --per-image JSON that eval_compare.py writes, and reports:
                    does not regress what already works.
 
 Usage (inside the container image, cwd /workspace):
-  python analyze_outliers.py results/x-perimage.json \
+  python -m userdevice_rtus.tools.analyze_outliers results/x-perimage.json \
       --ours iter050000 --metric dists [--top 12]
 """
 import argparse

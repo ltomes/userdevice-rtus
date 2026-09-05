@@ -1,3 +1,6 @@
+# Derived from RTMoSR — https://github.com/rewaifu/RTMoSR — MIT License.
+# See LICENSE (third-party notices) and docs/PROVENANCE.md.
+
 from typing import Any as Self
 
 import torch

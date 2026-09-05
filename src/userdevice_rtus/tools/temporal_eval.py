@@ -25,22 +25,25 @@ import glob, json, os, re, sys
 from collections import defaultdict
 import numpy as np, torch
 from PIL import Image
-sys.path.insert(0, "/ar"); sys.path.insert(0, "/workspace/traiNNer-redux")
 from safetensors.torch import load_file
-from rtmosr_ea_vendored import RTMoSREA
+
+from userdevice_rtus import build_tier
+from userdevice_rtus.paths import DATASETS, RESULTS
 
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-ROOT = "/workspace/datasets/greyduck2x_v2/val"
+ROOT = str(DATASETS / "rtus2x_v2" / "val")
 MAXPAIRS = int(os.environ.get("MAXPAIRS", "120"))
 
+# Candidates to score: JSON mapping label -> {"path": <ckpt>, "arch": <tier>}.
+SPECS = os.environ.get("TEMPORAL_SPECS", str(RESULTS / "temporal_specs.json"))
+OUT = os.environ.get("TEMPORAL_OUT", str(RESULTS / "temporal.json"))
+
+
 def build(arch):
-    if arch == "rtmosr_ea_film":
-        return RTMoSREA(scale=2, dim=48, ffn_expansion=2, n_blocks=3,
-                        unshuffle_mod=True, dccm=True, se=True)
-    if arch == "rtmosr_ea_film_sd":
-        return RTMoSREA(scale=2, dim=64, ffn_expansion=2, n_blocks=6,
-                        unshuffle_mod=True, dccm=True, se=True)
-    raise ValueError(arch)
+    # Geometry comes from userdevice_rtus.TIERS, the single source of truth.
+    # It used to be repeated here, which is exactly how a tier's shape drifts
+    # from the checkpoints it has to load.
+    return build_tier(arch)
 
 def load(path, arch):
     m = build(arch); m.load_state_dict(load_file(path), strict=True)
@@ -64,7 +67,7 @@ print(f"adjacent frame pairs: {len(pairs)}", flush=True)
 def t(u8):
     return torch.from_numpy(u8.transpose(2,0,1)[None].astype(np.float32)/255.0).to(DEV)
 
-specs = json.load(open("/ar/temporal_specs.json"))
+specs = json.load(open(SPECS))
 models = {k: load(v["path"], v["arch"]) for k, v in specs.items()}
 print(f"loaded {len(models)} candidates", flush=True)
 
@@ -95,5 +98,5 @@ for k in order:
     print(f"{k:<14} {v:9.4f} {(v-base)/base*100:+10.1f}%")
 print(f"\ncontrol gt_vs_gt = 0.0000 (sanity zero)")
 json.dump({k: float(np.mean(v)) for k, v in acc.items()},
-          open("/ar/results/2026-08-27-temporal.json","w"), indent=1)
-print("wrote /ar/results/2026-08-27-temporal.json")
+          open(OUT, "w"), indent=1)
+print(f"wrote {OUT}")

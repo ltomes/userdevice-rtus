@@ -35,8 +35,8 @@ SCRFD = PRETRAINED / "scrfd_2.5g_bnkps.onnx"
 
 #: Validation image sets, in the order tools should search them.
 VAL_SETS = [
-    DATASETS / "greyduck2x_v2" / "val",
-    DATASETS / "greyduck2x" / "val",
+    DATASETS / "rtus2x_v2" / "val",
+    DATASETS / "rtus2x" / "val",
 ]
 
 

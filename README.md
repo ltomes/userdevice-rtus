@@ -22,7 +22,7 @@ as the constraint and spends quality inside it.
 
 ```bash
 # 1. Build. Everything -- package, configs, traiNNer -- is baked in.
-podman build -t rtus-train:dev .          # or: docker build -f ContainerFile .
+podman build -f ContainerFile -t rtus-train:dev .   # arm64/Jetson: -f ContainerFile.tegra
 
 # 2. Check what the environment can actually do.
 docker run --rm rtus-train:dev rtus-info
@@ -40,7 +40,8 @@ bash scripts/run-train.sh configs/2x_RTMoSREA_film_stageE_dists90.yml
 # 6. Score every checkpoint and pick the best by DISTS (not the last one).
 #    Tools run as modules; only train and info are console commands.
 docker run --rm -v "$PWD:/workspace" rtus-train:dev \
-    python -m userdevice_rtus.tools.eval_compare --sweep experiments/<name>:rtmosr_ea_film
+    python -m userdevice_rtus.tools.eval_compare \
+      --sweep /workspace/experiments/<name>:rtmosr_ea_film
 
 # 7. Export to ONNX.
 docker run --rm -v "$PWD:/workspace" rtus-train:dev \
@@ -74,7 +75,7 @@ once a second drops frames and is useless here.
 
 Numbers are for the d48 tier: 9,722,409 params, TensorRT parity 75.51 dB
 against the torch fp32 reference (>40 dB required). The parameter counts are
-asserted at image build time, so they cannot drift away from the code.
+asserted at image build time for both tiers, so they cannot drift from the code.
 
 > **Provenance of these figures:** measured on the stage-D2 checkpoint. The
 > architecture is unchanged in later checkpoints, so the latency is expected
@@ -138,6 +139,7 @@ benchmark sets are out-of-distribution for a codec-trained model.
     src/userdevice_rtus/      the package: architectures, CLI, and
       tools/                  the verdict harness and data generators
     configs/                  traiNNer-redux configs, per stage and tier
+    ContainerFile[.tegra]     x86_64 image / arm64 Jetson image
     scripts/                  host-side helpers (build corpus, fetch assets)
     k8s/                      kustomize base + example overlay
     data/                     the data CONTRACT — never the data itself

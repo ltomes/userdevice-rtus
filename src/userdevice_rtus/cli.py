@@ -57,6 +57,19 @@ def train() -> None:
     os.chdir(root)
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
+
+    # traiNNer writes checkpoints to a RELATIVE experiments/ under its own
+    # tree, but the configs and paths.EXPERIMENTS both name
+    # $RTUS_DATA_ROOT/experiments -- which is the directory that actually gets
+    # mounted. Without this link the two diverge silently and a run's output
+    # lands inside the container, to be lost when it exits.
+    from userdevice_rtus.paths import EXPERIMENTS
+
+    EXPERIMENTS.mkdir(parents=True, exist_ok=True)
+    link = root / "experiments"
+    if not link.exists() and not link.is_symlink():
+        link.symlink_to(EXPERIMENTS, target_is_directory=True)
+
     runpy.run_path(str(script), run_name="__main__")
 
 

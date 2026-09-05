@@ -1,3 +1,7 @@
+# RETAINED AS REFERENCE, NOT INSTANTIATED. Nothing imports this module: the
+# teacher is loaded through spandrel. It is the RealPLKSR definition the EA
+# gate in rtmosr_ea_vendored.py was grafted from, kept so that graft can be
+# checked against its source. DySample is stubbed out below.
 # https://github.com/muslll/neosr/blob/master/neosr/archs/realplksr_arch.py
 # With modifications by umzi2 to support dysample and layer norm
 # from spandrel.architectures.PLKSR import PLKSR, RealPLKSR

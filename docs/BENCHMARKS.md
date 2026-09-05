@@ -1,24 +1,27 @@
 # Benchmarks
 
-## What already exists (internal)
+## What already exists
 
-The analysis chain in `eval/` is the project's existing verdict harness and
-is stronger than what most published SR models ship. Every wave verdict ran
+The analysis chain in `userdevice_rtus.tools` is the project's existing verdict harness and
+is stronger than what most published SR models ship. Every verdict ran
 these legs on identical frames:
 
-1. **Sweep** — `eval_compare.py`: PSNR, SSIM, DISTS, LPIPS across every
+1. **Sweep** — `eval_compare`: PSNR, SSIM, DISTS, LPIPS across every
    checkpoint, against bicubic (floor) and the teacher (reference), picking
    best-by-DISTS rather than by last iteration. Metrics come from traiNNer's
    own registry implementations so they are directly comparable to the
    figures printed during training. `crop_border=2`, `test_y_channel=True`.
-2. **Face gate** — `facegate/face_gate.py`, BLOCKING. Zero tolerance for
+2. **Face gate** — `facegate.face_gate`, BLOCKING. Zero tolerance for
    face-region violations.
-3. **Temporal** — flicker on adjacent frames, against a bicubic control.
-   The val set holds adjacent frames of the same clip; real motion cancels
-   between the two difference terms, leaving only invented temporal change.
-4. **Invention probe** — `hallucination_probe.py`: what fraction of
+3. **Invention probe** — `hallucination_probe`: what fraction of
    high-frequency detail the student invents rather than recovers. The kill
    condition is inventing more than the teacher (8.50%).
+4. **Temporal** — `temporal_eval`: flicker on adjacent frames, against a
+   bicubic control. The val set holds adjacent frames of the same clip; real
+   motion cancels between the two difference terms, leaving only invented
+   temporal change.
+
+Numbered to match the README, so "leg 3" means the same thing in both.
 
 A known gotcha, measured: traiNNer-redux's built-in `Best: <v> @ <iter>`
 line is unreliable for DISTS and LPIPS — it tracks the maximum, which is

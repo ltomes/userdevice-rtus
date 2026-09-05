@@ -4,7 +4,7 @@
 #  - targets move to 0.45*GT + 0.55*colorfix(teacher) (_blend55), up from
 #    stage-C 0.55/0.45 — more of the web model's texture in the target.
 #  - losses UNCHANGED from stage-C so the target change is the only variable.
-# Ship bar (STANDING-INSTRUCTIONS 2026-08-22): DISTS and LPIPS must land
+# Ship bar: DISTS and LPIPS must land
 # COMFORTABLY NEGATIVE vs the teacher. Face gate is blocking, and
 # hallucination_probe.py invention rate must not exceed the teacher's.
 name: 2x_RTMoSREA_film_stageD1
@@ -19,15 +19,15 @@ manual_seed: 1024
 
 datasets:
   train:
-    name: greyduck-blend55-train
+    name: rtus-blend55-train
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2_blend55/train/hr,
-      /workspace/datasets/greyduck2x_blend55/train/hr
+      /workspace/datasets/rtus2x_v2_blend55/train/hr,
+      /workspace/datasets/rtus2x_blend55/train/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/train/lr,
-      /workspace/datasets/greyduck2x/train/lr
+      /workspace/datasets/rtus2x_v2/train/lr,
+      /workspace/datasets/rtus2x/train/lr
     ]
     lq_size: 64
     use_hflip: true
@@ -36,15 +36,15 @@ datasets:
     batch_size_per_gpu: 8
     accum_iter: 1
   val:
-    name: greyduck-val-realGT
+    name: rtus-val-realGT
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/val/hr,
-      /workspace/datasets/greyduck2x/val/hr
+      /workspace/datasets/rtus2x_v2/val/hr,
+      /workspace/datasets/rtus2x/val/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/val/lr,
-      /workspace/datasets/greyduck2x/val/lr
+      /workspace/datasets/rtus2x_v2/val/lr,
+      /workspace/datasets/rtus2x/val/lr
     ]
 
 network_g:
@@ -54,10 +54,10 @@ network_d:
   type: dunet
 
 path:
-  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
+  pretrain_network_g: /workspace/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
   param_key_g: ~
   strict_load_g: true
-  resume_state: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageD1/training_states/10000.state
+  resume_state: ~   # was: 2x_RTMoSREA_film_stageD1/training_states/10000.state -- seed it before launch if resuming
 
 train:
   ema_decay: 0.999

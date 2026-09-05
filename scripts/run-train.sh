@@ -44,7 +44,7 @@ exec docker run --rm --name rtus-train \
   --gpus all \
   -v "$DATA_ROOT/datasets:/workspace/datasets" \
   -v "$DATA_ROOT/pretrained:/workspace/pretrained:ro" \
-  -v "$DATA_ROOT/experiments:/workspace/traiNNer-redux/experiments" \
+  -v "$DATA_ROOT/experiments:/workspace/experiments" \
   -v "$CFG_DIR:/workspace/config:ro" \
   "$IMAGE" \
-  python train.py -opt "/workspace/config/$CFG_NAME" "$@"
+  rtus-train -opt "/workspace/config/$CFG_NAME" "$@"

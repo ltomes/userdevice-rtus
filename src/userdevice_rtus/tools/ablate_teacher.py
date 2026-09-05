@@ -1,4 +1,4 @@
-"""Teacher mechanism ablation (2026-08-20, user request): which parts of
+"""Teacher mechanism ablation (2026-08-20): which parts of
 4xNomosWebPhoto_RealPLKSR produce the attributes we want to mimic?
 
 Method: run the intact teacher on N val LR images (baseline), then re-run
@@ -29,7 +29,7 @@ N_IMAGES = 24
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
 TEACHER = f"{_RTUS_ROOT}/pretrained/teacher_4xNomosWebPhoto_RealPLKSR.safetensors"
-VAL = f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr"
+VAL = f"{_RTUS_ROOT}/datasets/rtus2x/val/lr"
 OUT = f"{_RTUS_ROOT}/teacher_ablation.json"
 
 base_model = ModelLoader().load_from_file(TEACHER).model.eval().cuda().half()

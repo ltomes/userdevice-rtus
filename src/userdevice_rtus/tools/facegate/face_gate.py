@@ -1,4 +1,4 @@
-"""Face-generation gate (user requirement, 2026-08-20): reject any model
+"""Face-generation gate (project requirement, 2026-08-20): reject any model
 whose SR output contains a face the source does not.
 
 Method: SCRFD-2.5G (onnxruntime CPU) on the SR output AND on ground truth
@@ -8,7 +8,7 @@ borderline REAL faces don't count as hallucinations) is a violation.
 Gate: zero violations. Violating crops are saved for human review.
 
 Usage (inside the container image, needs onnxruntime):
-  python facegate/face_gate.py <ckpt.safetensors> <arch> [n_images]
+  python -m userdevice_rtus.tools.facegate.face_gate <ckpt.safetensors> <arch> [n_images]
   arch: rtmosr_l | rtmosr_ea_film | rtmosr_ea_film_sd
 """
 import glob
@@ -21,37 +21,33 @@ import torch
 from PIL import Image
 
 import onnxruntime as ort
-from scrfd_decode import (INPUT_SIZE, NMS_THRESH, decode_scrfd, nms,
-                          preprocess, unscale)
+from userdevice_rtus.tools.facegate.scrfd_decode import (
+    INPUT_SIZE, NMS_THRESH, decode_scrfd, nms,
+    preprocess, unscale)
 from safetensors.torch import load_file
 
 SR_THRESH = 0.5   # strict: what counts as "a face" in model output
 GT_THRESH = 0.2   # lenient: what counts as "there was a face" in source
 IOU_MATCH = 0.3
-ONNX = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                    "scrfd_2.5g_bnkps.onnx")
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+from userdevice_rtus.paths import SCRFD as _SCRFD
 
-VAL_DIRS = [f"{_RTUS_ROOT}/datasets/greyduck2x/val",
-            f"{_RTUS_ROOT}/datasets/greyduck2x_v2/val"]
+# The detector is fetched by scripts/fetch_assets.sh into PRETRAINED, which is
+# also where rtus-info looks for it. It used to be read from inside the
+# installed package, so fetch_assets and rtus-info would both report the gate
+# ready while the gate itself could not find its own model.
+ONNX = str(_SCRFD)
+
+VAL_DIRS = [f"{_RTUS_ROOT}/datasets/rtus2x/val",
+            f"{_RTUS_ROOT}/datasets/rtus2x_v2/val"]
 OUT_DIR = f"{_RTUS_ROOT}/facegate/violations"
 
 
 def build_model(arch, ckpt):
-    if arch == "rtmosr_l":
-        from userdevice_rtus.rtmosr_vendored import RTMoSR
-        m = RTMoSR(scale=2, dim=32, ffn_expansion=2, n_blocks=2,
-                   unshuffle_mod=True, dccm=True, se=True)
-    elif arch == "rtmosr_ea_film":
-        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
-        m = RTMoSREA(scale=2, dim=48, ffn_expansion=2, n_blocks=3,
-                     unshuffle_mod=True, dccm=True, se=True)
-    elif arch == "rtmosr_ea_film_sd":
-        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
-        m = RTMoSREA(scale=2, dim=64, ffn_expansion=2, n_blocks=6,
-                     unshuffle_mod=True, dccm=True, se=True)
-    else:
-        raise ValueError(arch)
+    from userdevice_rtus import build_tier
+
+    # Geometry from userdevice_rtus.TIERS, the single source of truth.
+    m = build_tier(arch)
     sd = load_file(ckpt) if ckpt.endswith(".safetensors") else None
     if sd is None:
         sd = torch.load(ckpt, map_location="cpu", weights_only=False)

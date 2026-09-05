@@ -11,13 +11,12 @@ always in the same order, and the ORIGINAL is first so the eye calibrates
 on ground truth before judging the rest.
 
 Usage (inside the container image, cwd /workspace):
-  python make_visual_ab.py --ckpt ours=<path>:rtmosr_ea_film [--n 8]
+  python -m userdevice_rtus.tools.make_visual_ab --ckpt ours=<path>:rtmosr_ea_film [--n 8]
       [--out /workspace/visual_ab]
 """
 import argparse
 import glob
 import os
-import sys
 
 import numpy as np
 import torch
@@ -26,7 +25,7 @@ from PIL import Image, ImageDraw
 
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
-VAL_SETS = [f"{_RTUS_ROOT}/datasets/greyduck2x_v2", f"{_RTUS_ROOT}/datasets/greyduck2x"]
+VAL_SETS = [f"{_RTUS_ROOT}/datasets/rtus2x_v2", f"{_RTUS_ROOT}/datasets/rtus2x"]
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ZOOM = 3
 TILE = 96          # crop size in GT pixels before zoom

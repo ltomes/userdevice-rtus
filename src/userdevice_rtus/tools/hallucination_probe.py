@@ -38,14 +38,13 @@ whether the model we distil from is itself over-inventing, which the user
 observed by eye on 2026-08-22.
 
 Usage (inside the container image, cwd /workspace):
-  python hallucination_probe.py --n 60 \
+  python -m userdevice_rtus.tools.hallucination_probe --n 60 \
       --ckpt stageC=<path>:rtmosr_ea_film [--out results/x.json]
 """
 import argparse
 import glob
 import json
 import os
-import sys
 
 import numpy as np
 import torch
@@ -54,7 +53,7 @@ from PIL import Image, ImageFilter
 
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
-VAL_SETS = [f"{_RTUS_ROOT}/datasets/greyduck2x_v2", f"{_RTUS_ROOT}/datasets/greyduck2x"]
+VAL_SETS = [f"{_RTUS_ROOT}/datasets/rtus2x_v2", f"{_RTUS_ROOT}/datasets/rtus2x"]
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 TILE = 32

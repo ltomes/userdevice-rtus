@@ -11,7 +11,7 @@ embarrassingly parallel and was measured CPU-bound at ~48% of one core
 Writes are atomic (tmp + rename) so an interrupted run never leaves a
 truncated PNG that the skip-if-exists resume would then treat as done.
 
-Usage: gen_blend_targets.py <dataset> [alpha_gt]
+Usage: python -m userdevice_rtus.tools.gen_blend_targets <dataset> [alpha_gt]
 (expects <dataset>/ and <dataset>_teacher/ to exist; writes
 <dataset>_blend/<split>/hr at the default alpha 0.7, or
 <dataset>_blend<teacher-pct>/<split>/hr when alpha is given —

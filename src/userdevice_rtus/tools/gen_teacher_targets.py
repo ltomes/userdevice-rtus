@@ -2,7 +2,7 @@
 
 teacher(LR) with 4xNomosWebPhoto_RealPLKSR (loaded via spandrel), output
 downscaled 2x (Lanczos) to the student's GT size. The downscale itself
-attenuates GAN hallucination (research agent, 2026-08-16). Teacher was
+attenuates GAN hallucination (measured 2026-08-16). Teacher was
 trained WITH noise injection so it denoises — stage B2 finishes on real GT
 to restore grain (ECO-style staged annealing).
 
@@ -21,7 +21,7 @@ from spandrel import ModelLoader
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
 BASE = f"{_RTUS_ROOT}"
-DATASET = sys.argv[1] if len(sys.argv) > 1 else "greyduck2x"
+DATASET = sys.argv[1] if len(sys.argv) > 1 else "rtus2x"
 TEACHER = os.path.join(BASE, "pretrained/teacher_4xNomosWebPhoto_RealPLKSR.safetensors")
 
 model = ModelLoader().load_from_file(TEACHER).model.eval().cuda().half()

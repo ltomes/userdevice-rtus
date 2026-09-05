@@ -39,7 +39,7 @@
 # experiments/<name>/models -- so a resume_state pointing somewhere else is
 # silently ignored.
 #
-# Every ckpt from this run MUST pass facegate/face_gate.py (exit 0) before
+# Every ckpt from this run MUST pass the face gate (exit 0) before
 # promotion -- zero tolerance for generated faces (same rule as stage C/D2).
 # Val runs against REAL GT so metrics measure fidelity, not blend fit.
 name: 2x_RTMoSREA_film_stageE_dists90
@@ -54,15 +54,15 @@ manual_seed: 1024
 
 datasets:
   train:
-    name: greyduck-blend45-train
+    name: rtus-blend45-train
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2_blend45/train/hr,
-      /workspace/datasets/greyduck2x_blend45/train/hr
+      /workspace/datasets/rtus2x_v2_blend45/train/hr,
+      /workspace/datasets/rtus2x_blend45/train/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/train/lr,
-      /workspace/datasets/greyduck2x/train/lr
+      /workspace/datasets/rtus2x_v2/train/lr,
+      /workspace/datasets/rtus2x/train/lr
     ]
     lq_size: 64
     use_hflip: true
@@ -75,15 +75,15 @@ datasets:
     batch_size_per_gpu: 8
     accum_iter: 1
   val:
-    name: greyduck-val-realGT
+    name: rtus-val-realGT
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/val/hr,
-      /workspace/datasets/greyduck2x/val/hr
+      /workspace/datasets/rtus2x_v2/val/hr,
+      /workspace/datasets/rtus2x/val/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/val/lr,
-      /workspace/datasets/greyduck2x/val/lr
+      /workspace/datasets/rtus2x_v2/val/lr,
+      /workspace/datasets/rtus2x/val/lr
     ]
 
 network_g:
@@ -93,12 +93,12 @@ network_d:
   type: dunet
 
 path:
-  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
+  pretrain_network_g: /workspace/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
   param_key_g: ~
   strict_load_g: true
   # Seeded from D2@50000 -- see the launch doc's seeding step. Points at
   # THIS experiment's own copy of the state (check_resume trap, see header).
-  resume_state: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageE_dists90/training_states/50000.state
+  resume_state: ~   # was: 2x_RTMoSREA_film_stageE_dists90/training_states/50000.state -- seed it before launch if resuming
 
 train:
   ema_decay: 0.999

@@ -17,15 +17,15 @@ manual_seed: 1024
 
 datasets:
   train:
-    name: greyduck-v1v2-train
+    name: rtus-v1v2-train
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/train/hr,
-      /workspace/datasets/greyduck2x/train/hr
+      /workspace/datasets/rtus2x_v2/train/hr,
+      /workspace/datasets/rtus2x/train/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/train/lr,
-      /workspace/datasets/greyduck2x/train/lr
+      /workspace/datasets/rtus2x_v2/train/lr,
+      /workspace/datasets/rtus2x/train/lr
     ]
     lq_size: 64
     use_hflip: true
@@ -34,15 +34,15 @@ datasets:
     batch_size_per_gpu: 8
     accum_iter: 1
   val:
-    name: greyduck-val-realGT
+    name: rtus-val-realGT
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/val/hr,
-      /workspace/datasets/greyduck2x/val/hr
+      /workspace/datasets/rtus2x_v2/val/hr,
+      /workspace/datasets/rtus2x/val/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/val/lr,
-      /workspace/datasets/greyduck2x/val/lr
+      /workspace/datasets/rtus2x_v2/val/lr,
+      /workspace/datasets/rtus2x/val/lr
     ]
 
 network_g:

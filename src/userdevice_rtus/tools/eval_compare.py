@@ -16,7 +16,7 @@ directly comparable to the numbers printed during training. crop_border=2
 and test_y_channel=True match the stage-C val config.
 
 Usage (inside the container image, cwd /workspace):
-  python eval_compare.py [--n 300] [--out results/<name>.json] \
+  python -m userdevice_rtus.tools.eval_compare [--n 300] [--out results/<name>.json] \
       [--ckpt LABEL=path.safetensors:arch] ...
 """
 import argparse
@@ -38,28 +38,21 @@ from userdevice_rtus.paths import DATASETS
 
 # Metrics come from traiNNer's own registry implementations so they stay
 # directly comparable to the figures printed during training.
-VAL_SETS = [(str(DATASETS / "greyduck2x_v2"), "greyduck2x_v2"),
-            (str(DATASETS / "greyduck2x"), "greyduck2x")]
+VAL_SETS = [(str(DATASETS / "rtus2x_v2"), "rtus2x_v2"),
+            (str(DATASETS / "rtus2x"), "rtus2x")]
 CROP_BORDER = 2
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def build_model(arch, ckpt):
     from safetensors.torch import load_file
-    if arch == "rtmosr_ea_film":
-        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
-        m = RTMoSREA(scale=2, dim=48, ffn_expansion=2, n_blocks=3,
-                     unshuffle_mod=True, dccm=True, se=True)
-    elif arch == "rtmosr_ea_film_sd":
-        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
-        m = RTMoSREA(scale=2, dim=64, ffn_expansion=2, n_blocks=6,
-                     unshuffle_mod=True, dccm=True, se=True)
-    elif arch == "rtmosr_l":
-        from userdevice_rtus.rtmosr_vendored import RTMoSR
-        m = RTMoSR(scale=2, dim=32, ffn_expansion=2, n_blocks=2,
-                   unshuffle_mod=True, dccm=True, se=True)
-    else:
-        raise ValueError(f"unknown arch {arch}")
+
+    from userdevice_rtus import build_tier
+
+    # Geometry comes from userdevice_rtus.TIERS. It used to be spelled out
+    # here and in four other tools with no canonical definition, which is how
+    # a tier's shape drifts away from the checkpoints it has to load.
+    m = build_tier(arch)
     m.load_state_dict(load_file(ckpt), strict=True)
     return m.eval().to(DEV)
 
@@ -191,7 +184,7 @@ def main():
     def gap(label, m):
         """Percent gap to the teacher on a lower-is-better metric.
 
-        This is the SHIP BAR (STANDING-INSTRUCTIONS, 2026-08-22): the student
+        This is the SHIP BAR: the student
         must land COMFORTABLY NEGATIVE — perceptually closer to ground truth
         than the web model, not merely level with it. Printed on every run so
         the bar is never something we have to recompute by hand.

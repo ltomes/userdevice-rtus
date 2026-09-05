@@ -1,6 +1,6 @@
 """Export a trained student checkpoint to fixed-shape ONNX + parity ref.
 
-Usage: export_student.py <ckpt.safetensors> <outname> [arch]
+Usage: python -m userdevice_rtus.tools.export_student <ckpt.safetensors> <outname> [arch]
 
 arch defaults to rtmosr_l for backwards compatibility with the earlier
 students. The film tier is a DIFFERENT architecture (RTMoSREA, dim 48 /
@@ -59,8 +59,8 @@ for sname, (h, w) in SHAPES.items():
     print(f"exported {path}", flush=True)
 
 # parity reference on a real image at the 540p working point
-src = sorted(os.listdir(f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr"))[0]
-img = Image.open(f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr/{src}").convert("RGB")
+src = sorted(os.listdir(f"{_RTUS_ROOT}/datasets/rtus2x/val/lr"))[0]
+img = Image.open(f"{_RTUS_ROOT}/datasets/rtus2x/val/lr/{src}").convert("RGB")
 img = img.resize((960, 540), Image.BICUBIC)
 x = torch.from_numpy(np.asarray(img).astype(np.float32) / 255.0
                      ).permute(2, 0, 1)[None]

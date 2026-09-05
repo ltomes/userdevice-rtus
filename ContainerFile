@@ -39,7 +39,7 @@ COPY scripts ./scripts
 # would pull a second multi-gigabyte copy that shadows the tested one.
 RUN uv pip install --python "$(command -v python)" --break-system-packages --no-cache --no-deps . \
     && uv pip install --python "$(command -v python)" --break-system-packages --no-cache \
-         safetensors spandrel onnx onnxscript onnxruntime
+         pillow safetensors huggingface-hub spandrel onnx onnxscript onnxruntime
 
 # traiNNer-redux is distributed as an APPLICATION you clone and run, not as a
 # library: its pyproject declares dependencies and no console entry points, and
@@ -52,9 +52,10 @@ RUN uv pip install --python "$(command -v python)" --break-system-packages --no-
 # silent non-registration is otherwise only discovered part-way into training.
 RUN python -c "import userdevice_rtus as r; \
 assert r.USING_REAL_REGISTRY, 'traiNNer registry not resolved'; \
-m = r.build_tier('rtmosr_ea_film'); \
-n = sum(p.numel() for p in m.parameters()); \
-print(f'rtus ok: d48={n:,} params, tiers={sorted(r.TIERS)}')"
+expect = {'rtmosr_ea_film': 9722409, 'rtmosr_ea_film_sd': 33886420}; \
+got = {t: sum(p.numel() for p in r.build_tier(t).parameters()) for t in expect}; \
+assert got == expect, f'tier geometry drifted: {got} != {expect}'; \
+print(f'rtus ok: {got}')"
 
 # traiNNer's train.py resolves experiment directories relative to its own tree.
 WORKDIR /opt/traiNNer-redux

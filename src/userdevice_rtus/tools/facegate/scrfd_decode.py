@@ -1,30 +1,23 @@
 #!/usr/bin/env python3
-"""
-scrfd_decode.py — Phase 1 SCRFD-2.5G standalone detector test.
+"""SCRFD-2.5G ONNX output decoder, used by the face gate.
 
-Runs scrfd_2.5g_bnkps.onnx on a test frame via onnxruntime, decodes the
-9 output tensors into bboxes + 5-point landmarks, applies NMS, and saves
-an annotated image.
+Runs `scrfd_2.5g_bnkps.onnx` through onnxruntime, decodes its 9 output
+tensors into bounding boxes and 5-point landmarks, and applies NMS. The
+anchor generation and decoding maths are documented inline below, because
+the model's raw outputs are stride-major and not self-describing.
 
-Goals:
-  1. Verify the output decoder is correct before porting to C.
-  2. Confirm accuracy on real TV-content frames.
-  3. Document the anchor generation / decoding math for vf_cuda_face_restore.c.
+`face_gate` imports `preprocess`, `decode_scrfd`, `nms`, `unscale`,
+`INPUT_SIZE` and `NMS_THRESH` from here. Running this module directly is a
+correctness aid: it annotates one image so the decode can be eyeballed.
 
-Performance is already measured via trtexec (sub-millisecond GPU compute on an SM110-class device).
-This script exercises correctness, not speed.
+CPU inference is deliberate — this exercises decoder correctness, not
+throughput, and the gate runs over tens of images rather than a video stream.
 
-Usage (onnxruntime has no GPU dep here — CPU inference is fine for
-validation since we're testing decoder logic not throughput):
-    uv run --with onnxruntime --with numpy --with pillow python scrfd_decode.py \
-        --onnx $SCRFD_DIR/scrfd_2.5g_bnkps.onnx \
-        --image $SAMPLE_DIR/bbb-480p.mp4_frame.jpg \
-        --out   /tmp/scrfd_result.jpg
+    python -m userdevice_rtus.tools.facegate.scrfd_decode \
+        --onnx <pretrained>/scrfd_2.5g_bnkps.onnx \
+        --image <frame.jpg> --out /tmp/scrfd_result.jpg
 
-Or extract a frame first:
-    ffmpeg -i $SAMPLE_DIR/bbb-480p.mp4 -vframes 1 \
-           -ss 00:00:30 /tmp/test_frame.jpg
-    uv run ... scrfd_decode.py --onnx ... --image /tmp/test_frame.jpg --out /tmp/out.jpg
+Fetch the detector with `scripts/fetch_assets.sh`.
 """
 
 from __future__ import annotations

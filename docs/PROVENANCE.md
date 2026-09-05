@@ -44,8 +44,8 @@ resolve unilaterally. A commercial release should confirm with the author.
 | Component | Origin | Licence | Evidence |
 |---|---|---|---|
 | HR training images | NomosRealWeb release — `hr.tar`, 6000 x 512² Nomos-v2 HRs | **Not applicable — see below** | Nomos-v2 states no licence of its own and is distilled from 14 upstream datasets. We distribute a model, not the data. |
-| LR training images | Generated locally from the HRs by our own scripts | Ours | `scripts/gen_pairs_h264.sh`, `scripts/gen_pairs_v2.py` |
-| Teacher targets | Output of the teacher over our LR | Follows the teacher | `scripts/gen_teacher_targets.py` |
+| LR training images | Generated locally from the HRs by our own scripts | Ours | `scripts/gen_pairs_h264.sh`, `userdevice_rtus.tools.gen_pairs_v2` |
+| Teacher targets | Output of the teacher over our LR | Follows the teacher | `userdevice_rtus.tools.gen_teacher_targets` |
 
 ### Corpus lineage, for the record
 
@@ -85,7 +85,7 @@ teacher was itself trained on Nomos-v2.
 
 **No private media is involved.** The corpus contains no film, television or
 personal library content: the HR source is a public photograph dataset
-(`scripts/gen_pairs_v2.py`, `SRC = .../nomosrealweb/hr`), motion is
+(`userdevice_rtus.tools.gen_pairs_v2`, `SRC = .../nomosrealweb/hr`), motion is
 synthesised by sub-pixel drift over stills, and the only real-video element is
 the H.264 degradation stage. An earlier note in this project claiming the
 corpus was a private film library was incorrect and has been withdrawn. See

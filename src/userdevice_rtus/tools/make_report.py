@@ -9,7 +9,7 @@ Panels are re-encoded to JPEG and width-capped, because a 4-column PNG panel
 is several MB and a dozen of them will not fit in a single page.
 
 Usage (inside the container image, cwd /workspace):
-  python make_report.py --metrics results/x.json --panels visual_ab_30k \
+  python -m userdevice_rtus.tools.make_report --metrics results/x.json --panels visual_ab_30k \
       --title "stage-C @30k" --out /workspace/report.html
 """
 import argparse
@@ -18,6 +18,7 @@ import glob
 import io
 import json
 import os
+import re
 
 from PIL import Image
 
@@ -25,7 +26,7 @@ MAX_W = 1600
 JPEG_Q = 86
 # lower-is-better metrics, so the table can mark winners correctly
 LOWER_BETTER = {"dists", "lpips"}
-OURS_RE = __import__("re").compile(r"stage|ours|iter", __import__('re').I)
+OURS_RE = re.compile(r"stage|ours|iter", re.I)
 
 NICE = {"psnr": "PSNR", "ssim": "SSIM", "dists": "DISTS", "lpips": "LPIPS"}
 

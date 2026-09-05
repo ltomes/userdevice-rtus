@@ -1,10 +1,10 @@
 # userDevice film-tier d48-b3, stage C: AGGRESSIVE texture recovery
-# (user-approved option 3, 2026-08-20). From the stage-A fidelity ckpt:
+# (2026-08-20). From the stage-A fidelity ckpt:
 #  - raised teacher weight: targets are 0.55*GT + 0.45*colorfix(teacher)
 #    (gen_blend_targets.py <ds> 0.55 -> *_blend45; stage B used 0.7/0.3)
 #  - DISTS at 0.3 + light GAN (dunet, weight 0.02) for texture
 #  - LDL kept at 0.5 to police GAN artifacts (strict artifact bar)
-# Every ckpt from this run MUST pass facegate/face_gate.py (exit 0) before
+# Every ckpt from this run MUST pass the face gate (exit 0) before
 # promotion — zero tolerance for generated faces.
 # Val runs against REAL GT so metrics measure fidelity, not blend fit.
 name: 2x_RTMoSREA_film_stageC
@@ -19,15 +19,15 @@ manual_seed: 1024
 
 datasets:
   train:
-    name: greyduck-blend45-train
+    name: rtus-blend45-train
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2_blend45/train/hr,
-      /workspace/datasets/greyduck2x_blend45/train/hr
+      /workspace/datasets/rtus2x_v2_blend45/train/hr,
+      /workspace/datasets/rtus2x_blend45/train/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/train/lr,
-      /workspace/datasets/greyduck2x/train/lr
+      /workspace/datasets/rtus2x_v2/train/lr,
+      /workspace/datasets/rtus2x/train/lr
     ]
     lq_size: 64
     use_hflip: true
@@ -36,15 +36,15 @@ datasets:
     batch_size_per_gpu: 8
     accum_iter: 1
   val:
-    name: greyduck-val-realGT
+    name: rtus-val-realGT
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/val/hr,
-      /workspace/datasets/greyduck2x/val/hr
+      /workspace/datasets/rtus2x_v2/val/hr,
+      /workspace/datasets/rtus2x/val/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/val/lr,
-      /workspace/datasets/greyduck2x/val/lr
+      /workspace/datasets/rtus2x_v2/val/lr,
+      /workspace/datasets/rtus2x/val/lr
     ]
 
 network_g:
@@ -54,7 +54,7 @@ network_d:
   type: dunet
 
 path:
-  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
+  pretrain_network_g: /workspace/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
   param_key_g: ~
   strict_load_g: true
   resume_state: ~

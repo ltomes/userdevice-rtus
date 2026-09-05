@@ -52,17 +52,21 @@ COPY scripts ./scripts
 # anything the base already provides.
 RUN pip install --no-cache-dir --no-deps . \
     && pip install --no-cache-dir ${PIP_EXTRA} \
-         pillow safetensors huggingface-hub spandrel onnx onnxscript
+         pillow safetensors huggingface-hub spandrel onnx onnxscript onnxruntime
 
 # Verify by RUNNING, not only at build time: a build-time gate can be served
 # from a layer cache and silently stop executing. This check is cheap enough
 # to keep here as well, but rtus-info in the Job is what actually proves it.
-RUN python -c "import userdevice_rtus as r; \
+RUN python -c "import userdevice_rtus as r, torch; \
 assert r.USING_REAL_REGISTRY, 'traiNNer registry not resolved'; \
-m = r.build_tier('rtmosr_ea_film'); \
-n = sum(p.numel() for p in m.parameters()); \
-import torch; \
-print(f'rtus tegra ok: d48={n:,} params, torch={torch.__version__}')"
+expect = {'rtmosr_ea_film': 9722409, 'rtmosr_ea_film_sd': 33886420}; \
+got = {t: sum(p.numel() for p in r.build_tier(t).parameters()) for t in expect}; \
+assert got == expect, f'tier geometry drifted: {got} != {expect}'; \
+print(f'rtus tegra ok: {got}, torch={torch.__version__}')"
+
+# traiNNer's train.py resolves experiment directories relative to its own tree;
+# rtus-train chdirs there and links experiments/ to RTUS_DATA_ROOT/experiments.
+WORKDIR /opt/traiNNer-redux
 
 ENV RTUS_DATA_ROOT=/workspace
 CMD ["rtus-info"]

@@ -1,5 +1,5 @@
-# Training data — NEVER committed. Regenerate with scripts/fetch_data.sh
-# and scripts/gen_pairs_*.  See docs/DATA.md.
+# Training data — NEVER committed. Regenerate with scripts/gen_pairs_h264.sh
+# or userdevice_rtus.tools.gen_pairs_v2. See data/README.md.
 datasets/
 data/**
 !data/README.md

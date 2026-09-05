@@ -10,13 +10,14 @@ reconstructed from logs.
 
 ## Starting a run
 
-Copy `overlays/example`, change three things, apply:
+Copy `overlays/example`, change four things, apply:
 
 ```
 cp -r k8s/overlays/example k8s/overlays/my-run
 # 1. nameSuffix       -- what this run is called
 # 2. the -opt arg     -- which config, by name, from /app/configs
 # 3. the data volume  -- your PVC or hostPath
+# 4. the images: block -- point it at your registry, not your-registry.example
 ```
 
 The whole overlay is ~30 lines. Everything else — GPU limit, memory ceiling,

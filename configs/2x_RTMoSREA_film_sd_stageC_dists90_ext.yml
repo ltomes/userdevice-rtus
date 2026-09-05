@@ -24,15 +24,15 @@ manual_seed: 1024
 
 datasets:
   train:
-    name: greyduck-blend45-train
+    name: rtus-blend45-train
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2_blend45/train/hr,
-      /workspace/datasets/greyduck2x_blend45/train/hr
+      /workspace/datasets/rtus2x_v2_blend45/train/hr,
+      /workspace/datasets/rtus2x_blend45/train/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/train/lr,
-      /workspace/datasets/greyduck2x/train/lr
+      /workspace/datasets/rtus2x_v2/train/lr,
+      /workspace/datasets/rtus2x/train/lr
     ]
     lq_size: 64
     use_hflip: true
@@ -41,15 +41,15 @@ datasets:
     batch_size_per_gpu: 8
     accum_iter: 1
   val:
-    name: greyduck-val-realGT
+    name: rtus-val-realGT
     type: pairedimagedataset
     dataroot_gt: [
-      /workspace/datasets/greyduck2x_v2/val/hr,
-      /workspace/datasets/greyduck2x/val/hr
+      /workspace/datasets/rtus2x_v2/val/hr,
+      /workspace/datasets/rtus2x/val/hr
     ]
     dataroot_lq: [
-      /workspace/datasets/greyduck2x_v2/val/lr,
-      /workspace/datasets/greyduck2x/val/lr
+      /workspace/datasets/rtus2x_v2/val/lr,
+      /workspace/datasets/rtus2x/val/lr
     ]
 
 network_g:
@@ -59,7 +59,7 @@ network_d:
   type: dunet
 
 path:
-  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_sd_stageA/models/net_g_ema_150000.safetensors
+  pretrain_network_g: /workspace/experiments/2x_RTMoSREA_film_sd_stageA/models/net_g_ema_150000.safetensors
   param_key_g: ~
   strict_load_g: true
   resume_state: ~
