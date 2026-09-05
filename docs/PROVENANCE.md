@@ -89,3 +89,45 @@ third-party weight origin must be resolved first.
 the licence of `4xNomosWebPhoto_RealPLKSR`, the licence of the NomosRealWeb
 release, and the neosr licence behind `realplksr_vendored.py`. Those are
 about *code and teacher*, not weights.
+
+---
+
+## Licence findings — checked against upstream sources 2026-09-05
+
+| Component | Licence | Source |
+|---|---|---|
+| `traiNNer-redux` | **Apache-2.0** | `LICENSE.txt` in the local clone |
+| RTMoSR (`rtmosr_vendored.py`) | **MIT** | github.com/rewaifu/RTMoSR — the upstream this file had no header for |
+| neosr (behind `realplksr_vendored.py`) | **Apache-2.0** | github.com/neosr-project/neosr, sidebar |
+| Teacher `4xNomosWebPhoto_RealPLKSR` | **CC-BY-4.0** | huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR card front-matter (`license: cc-by-4.0`); OpenModelDB lists CC-BY-4.0 |
+| Nomos-v2 / 4xNomosRealWeb dataset | **STILL UNKNOWN** | Neither the GitHub release page nor OpenModelDB states a dataset licence |
+
+**Every code dependency is permissive** (MIT / Apache-2.0), and the teacher
+is CC-BY-4.0 — attribution required, commercial use permitted, derivatives
+permitted. A distilled student is therefore releasable, which was the single
+largest open risk.
+
+### Obligations this creates for the release
+
+1. **Attribute Philip Hofmann** for `4xNomosWebPhoto_RealPLKSR` in the model
+   card, as CC-BY-4.0 requires. The student is distilled from it; this is not
+   optional and not satisfied by a passing mention in a footnote.
+2. **Carry the MIT notice** for RTMoSR (rewaifu) with the architecture code.
+3. **Carry Apache-2.0 NOTICE/attribution** for traiNNer-redux and neosr.
+4. State the Nomos-v2 lineage even though we redistribute none of it.
+
+### One discrepancy, recorded rather than smoothed over
+
+The GitHub release page for the teacher states its licence as
+**"CC-BY-0.4"**, which is not a real Creative Commons version. The author's
+own Hugging Face card declares `cc-by-4.0` and OpenModelDB lists CC-BY-4.0.
+Reading it as CC-BY-4.0 is the only coherent interpretation, but it is an
+upstream typo and not something we can resolve unilaterally. If the release
+is commercial, confirm with the author rather than relying on this note.
+
+### Remaining unknown
+
+The **dataset** licence (Nomos-v2, and Phhofm's 4xNomosRealWeb degraded LR
+release). We redistribute no images, so this bounds what may be *claimed*
+about the corpus, not what may be shipped. It should still be settled before
+the model card asserts anything about the training data's licence.
