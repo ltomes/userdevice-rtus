@@ -113,7 +113,9 @@ revived, its weight origin must be resolved first.
 because the standing rule at the foot of this file requires it: *"Set
 CC-BY-SA-4.0. I have to have something set before its public so why not."*
 
-Written into `LICENSE` under RELEASED MODEL WEIGHTS. It covers released
+Written into `NOTICE` under RELEASED MODEL WEIGHTS (`LICENSE` is kept as the
+bare MIT text so licence detection reads the code licence correctly). It
+covers released
 checkpoints, ONNX exports and any TensorRT engines — not the code in this
 repository, which stays MIT.
 

@@ -187,14 +187,15 @@ the commit it was trained from. No release has been published yet.
 ## Provenance, licence and attribution
 
 Code in this repository is **MIT** (see [`LICENSE`](LICENSE)). Third-party
-notices are in the same file, for
+notices are in [`NOTICE`](NOTICE), for
 [RTMoSR](https://github.com/rewaifu/RTMoSR) (MIT),
 [neosr](https://github.com/neosr-project/neosr) and
 [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
 (both Apache-2.0).
 
 **Released model weights are [CC BY-SA
-4.0](https://creativecommons.org/licenses/by-sa/4.0/)** — usable and
+4.0](https://creativecommons.org/licenses/by-sa/4.0/)** (see
+[`NOTICE`](NOTICE)) — usable and
 modifiable, including commercially, provided you attribute and license
 redistributed derivatives of the weights the same way. The code licence and
 the weights licence are deliberately different; the weights are not
