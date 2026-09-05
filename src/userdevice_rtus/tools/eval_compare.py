@@ -29,17 +29,17 @@ import numpy as np
 import torch
 from PIL import Image
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                "traiNNer-redux"))
-
 from traiNNer.archs.lpips_arch import LPIPS
 from traiNNer.losses.dists_loss import DISTSLoss
 from traiNNer.metrics.psnr_ssim import calculate_psnr, calculate_ssim
 from traiNNer.utils.img_util import img2batchedtensor
 
-VAL_SETS = [("/workspace/datasets/greyduck2x_v2", "greyduck2x_v2"),
-            ("/workspace/datasets/greyduck2x", "greyduck2x")]
+from userdevice_rtus.paths import DATASETS
+
+# Metrics come from traiNNer's own registry implementations so they stay
+# directly comparable to the figures printed during training.
+VAL_SETS = [(str(DATASETS / "greyduck2x_v2"), "greyduck2x_v2"),
+            (str(DATASETS / "greyduck2x"), "greyduck2x")]
 CROP_BORDER = 2
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -47,15 +47,15 @@ DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def build_model(arch, ckpt):
     from safetensors.torch import load_file
     if arch == "rtmosr_ea_film":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         m = RTMoSREA(scale=2, dim=48, ffn_expansion=2, n_blocks=3,
                      unshuffle_mod=True, dccm=True, se=True)
     elif arch == "rtmosr_ea_film_sd":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         m = RTMoSREA(scale=2, dim=64, ffn_expansion=2, n_blocks=6,
                      unshuffle_mod=True, dccm=True, se=True)
     elif arch == "rtmosr_l":
-        from rtmosr_vendored import RTMoSR
+        from userdevice_rtus.rtmosr_vendored import RTMoSR
         m = RTMoSR(scale=2, dim=32, ffn_expansion=2, n_blocks=2,
                    unshuffle_mod=True, dccm=True, se=True)
     else:

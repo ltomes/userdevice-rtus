@@ -18,7 +18,9 @@ import torch
 from PIL import Image
 from spandrel import ModelLoader
 
-BASE = "/workspace"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+BASE = f"{_RTUS_ROOT}"
 DATASET = sys.argv[1] if len(sys.argv) > 1 else "greyduck2x"
 TEACHER = os.path.join(BASE, "pretrained/teacher_4xNomosWebPhoto_RealPLKSR.pth")
 

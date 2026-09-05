@@ -20,8 +20,6 @@ import numpy as np
 import torch
 from PIL import Image
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import onnxruntime as ort
 from scrfd_decode import (INPUT_SIZE, NMS_THRESH, decode_scrfd, nms,
                           preprocess, unscale)
@@ -32,22 +30,24 @@ GT_THRESH = 0.2   # lenient: what counts as "there was a face" in source
 IOU_MATCH = 0.3
 ONNX = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                     "scrfd_2.5g_bnkps.onnx")
-VAL_DIRS = ["/workspace/datasets/greyduck2x/val",
-            "/workspace/datasets/greyduck2x_v2/val"]
-OUT_DIR = "/workspace/facegate/violations"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+VAL_DIRS = [f"{_RTUS_ROOT}/datasets/greyduck2x/val",
+            f"{_RTUS_ROOT}/datasets/greyduck2x_v2/val"]
+OUT_DIR = f"{_RTUS_ROOT}/facegate/violations"
 
 
 def build_model(arch, ckpt):
     if arch == "rtmosr_l":
-        from rtmosr_vendored import RTMoSR
+        from userdevice_rtus.rtmosr_vendored import RTMoSR
         m = RTMoSR(scale=2, dim=32, ffn_expansion=2, n_blocks=2,
                    unshuffle_mod=True, dccm=True, se=True)
     elif arch == "rtmosr_ea_film":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         m = RTMoSREA(scale=2, dim=48, ffn_expansion=2, n_blocks=3,
                      unshuffle_mod=True, dccm=True, se=True)
     elif arch == "rtmosr_ea_film_sd":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         m = RTMoSREA(scale=2, dim=64, ffn_expansion=2, n_blocks=6,
                      unshuffle_mod=True, dccm=True, se=True)
     else:
@@ -148,7 +148,7 @@ def main():
     result = {"ckpt": ckpt, "arch": arch, "images_checked": checked,
               "violations": violations, "content_borne": content_borne,
               "verdict": verdict}
-    with open("/workspace/facegate/last_result.json", "w") as f:
+    with open(f"{_RTUS_ROOT}/facegate/last_result.json", "w") as f:
         json.dump(result, f, indent=2)
     print(f"FACE GATE {verdict}: {len(violations)} violations "
           f"in {checked} images")

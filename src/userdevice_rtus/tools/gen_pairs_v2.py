@@ -28,8 +28,10 @@ import sys
 import numpy as np
 from PIL import Image
 
-SRC = "/workspace/datasets/nomosrealweb/hr"
-OUT = "/workspace/datasets/greyduck2x_v2"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+SRC = f"{_RTUS_ROOT}/datasets/nomosrealweb/hr"
+OUT = f"{_RTUS_ROOT}/datasets/greyduck2x_v2"
 TMP = "/tmp/clip"
 WIN, N_HARVEST = 480, 6
 KERNELS = [Image.BICUBIC, Image.BILINEAR, Image.LANCZOS, Image.BOX]

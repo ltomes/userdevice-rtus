@@ -25,7 +25,9 @@ from multiprocessing import Pool
 import numpy as np
 from PIL import Image
 
-BASE = "/workspace/datasets"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+BASE = f"{_RTUS_ROOT}/datasets"
 DS = sys.argv[1]
 ALPHA_GT = float(sys.argv[2]) if len(sys.argv) > 2 else 0.7
 SUFFIX = "_blend" if len(sys.argv) <= 2 else \

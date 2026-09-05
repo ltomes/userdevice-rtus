@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rtus-train
+  labels:
+    app.kubernetes.io/name: rtus
+    rtus.userdevice.net/kind: train
+spec:
+  # Training is not idempotent: a retry resumes from whatever checkpoint the
+  # last attempt wrote, which is usually what you want, but a silent retry
+  # after an OOM will look like a mysteriously slow run. Fail visibly instead.
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 604800
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rtus
+        rtus.userdevice.net/kind: train
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: train
+          image: rtus-train:dev
+          # Config name only -- configs are baked into the image, so there is
+          # nothing to copy onto a node and nothing to keep in sync.
+          args:
+            - rtus-train
+            - -opt
+            - /app/configs/2x_RTMoSREA_film_stageE_dists90.yml
+          env:
+            - name: RTUS_DATA_ROOT
+              value: /workspace
+            # Dataloader workers are the dominant host-RAM cost (~1.2 GB each);
+            # the configs set num_worker_per_gpu accordingly.
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+              memory: 24Gi
+            requests:
+              memory: 16Gi
+              cpu: "4"
+          volumeMounts:
+            - name: data
+              mountPath: /workspace
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: data
+          # Overlay replaces this with the real source (PVC or hostPath).
+          emptyDir: {}
+        - name: dshm
+          # torch dataloader workers communicate through shared memory; the
+          # 64 MB default will deadlock a multi-worker run.
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi

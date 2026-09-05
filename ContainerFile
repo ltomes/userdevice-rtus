@@ -1,0 +1,60 @@
+# RTUS training / evaluation image.
+#
+#   podman build -t rtus-train:dev .          (or: docker build -f ContainerFile)
+#
+# Self-contained by design: the package, its configs and traiNNer are all baked
+# in, so a Kubernetes Job needs to mount data and nothing else. The alternative
+# -- bind-mounting source and copying configs onto nodes by hand -- is how one
+# training config in this project's history became unrecoverable.
+
+FROM pytorch/pytorch:2.12.1-cuda12.6-cudnn9-runtime
+
+# ffmpeg for the pair generators, which encode real H.264 to produce the
+# training degradations; libGL/glib for image ops.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git ffmpeg libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# uv resolves and installs far faster than pip and honours a lockfile.
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# traiNNer is not on PyPI. Pin it by revision: it supplies both the
+# architecture registry contract and the metric implementations, so an
+# unpinned upstream can silently move every number this project reports.
+ARG TRAINNER_REF=master
+RUN git clone --depth 1 --branch "${TRAINNER_REF}" \
+      https://github.com/the-database/traiNNer-redux /opt/traiNNer-redux \
+    && uv pip install --python "$(command -v python)" --break-system-packages --no-cache -e /opt/traiNNer-redux
+
+WORKDIR /app
+COPY pyproject.toml README.md LICENSE ./
+COPY src ./src
+COPY configs ./configs
+COPY scripts ./scripts
+
+# torch and the CUDA stack under it come from the base image; reinstalling
+# would pull a second multi-gigabyte copy that shadows the tested one.
+RUN uv pip install --python "$(command -v python)" --break-system-packages --no-cache --no-deps . \
+    && uv pip install --python "$(command -v python)" --break-system-packages --no-cache \
+         safetensors spandrel onnx onnxscript onnxruntime
+
+# NOTE: a NON-editable install of traiNNer-redux ships an EMPTY `traiNNer`
+# package. Upstream sets `include = ["traiNNer"]` in its setuptools package
+# discovery, which matches the top-level package but none of its subpackages
+# (traiNNer.utils, traiNNer.archs, ...). Installing it EDITABLE resolves
+# imports from the source tree and sidesteps that upstream bug.
+
+# Fail the build if the package cannot import or the architectures did not
+# register. Catching that here is the entire point of the registry shim: a
+# silent non-registration is otherwise only discovered part-way into training.
+RUN python -c "import userdevice_rtus as r; \
+assert r.USING_REAL_REGISTRY, 'traiNNer registry not resolved'; \
+m = r.build_tier('rtmosr_ea_film'); \
+n = sum(p.numel() for p in m.parameters()); \
+print(f'rtus ok: d48={n:,} params, tiers={sorted(r.TIERS)}')"
+
+# traiNNer's train.py resolves experiment directories relative to its own tree.
+WORKDIR /opt/traiNNer-redux
+
+ENV RTUS_DATA_ROOT=/workspace
+CMD ["rtus-info"]

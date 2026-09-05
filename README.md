@@ -18,6 +18,41 @@ That is the difference this repository is about. Most models optimise a
 quality metric and report no frame time at all; this one treats the deadline
 as the constraint and spends quality inside it.
 
+## Quickstart
+
+```bash
+# 1. Build. Everything -- package, configs, traiNNer -- is baked in.
+podman build -t rtus-train:dev .          # or: docker build -f ContainerFile .
+
+# 2. Check what the environment can actually do.
+docker run --rm rtus-train:dev rtus-info
+
+# 3. Fetch the two third-party assets we do not redistribute.
+bash scripts/fetch_assets.sh ./pretrained
+
+# 4. Build the training corpus from the public HR set.
+docker run --rm -v "$PWD:/workspace" rtus-train:dev \
+    rtus-gen-pairs                        # v2 corpus: motion + real H.264
+
+# 5. Train a config, by name.
+bash scripts/run-train.sh configs/2x_RTMoSREA_film_stageE_dists90.yml
+
+# 6. Score every checkpoint and pick the best by DISTS (not the last one).
+docker run --rm -v "$PWD:/workspace" rtus-train:dev \
+    rtus-eval --sweep experiments/<name>:rtmosr_ea_film
+
+# 7. Export to ONNX.
+docker run --rm -v "$PWD:/workspace" rtus-train:dev \
+    rtus-export <ckpt.safetensors> <name> rtmosr_ea_film
+```
+
+Running without containers: `uv pip install -e '.[train,teacher,export]'`,
+then set `RTUS_DATA_ROOT` to wherever your data lives. `rtus-info` will tell
+you what is missing.
+
+For Kubernetes, see [`k8s/README.md`](k8s/README.md) — the image is
+self-contained, so a Job supplies data and a config name and nothing else.
+
 ## Target hardware and measured throughput
 
 Target: **NVIDIA Jetson Thor class**, TensorRT FP16.
@@ -36,8 +71,9 @@ not merely fast on average, it is *steady*, which is what a playback
 pipeline actually needs. A model that averages 30 fps but stalls for 60 ms
 once a second drops frames and is useless here.
 
-Numbers are for the d48 tier: 9.72M params, TensorRT parity 75.51 dB
-against the torch fp32 reference (>40 dB required).
+Numbers are for the d48 tier: 9,722,409 params, TensorRT parity 75.51 dB
+against the torch fp32 reference (>40 dB required). The parameter counts are
+asserted at image build time, so they cannot drift away from the code.
 
 > **Provenance of these figures:** measured on the stage-D2 checkpoint. The
 > architecture is unchanged in later checkpoints, so the latency is expected
@@ -62,7 +98,7 @@ with a per-pixel EA gate on the residual branch of every backbone block — a
 design derived from ablating the teacher, which showed its quality lives in
 EA gating and collective depth, not in its 17px large kernels. So the student
 keeps the cheap fast backbone and buys depth over width. That ablation is in
-`eval/ablate_teacher.py`; it is the reason this architecture looks the way
+`userdevice_rtus.tools.ablate_teacher`; it is the reason this architecture looks the way
 it does.
 
 ## What it was NOT trained on
@@ -74,7 +110,7 @@ degradation. The `_film` in the config names denotes a latency tier — the
 
 ## Quality is gated, not scored
 
-`eval/` holds the verdict harness. A checkpoint is not accepted because a
+`userdevice_rtus.tools` holds the verdict harness. A checkpoint is not accepted because a
 number went up:
 
 1. **Sweep** — PSNR/SSIM/DISTS/LPIPS across every checkpoint, selecting
@@ -95,10 +131,11 @@ benchmark sets are out-of-distribution for a codec-trained model.
 
 ## Layout
 
-    src/userdevice_rtus/     architectures (student, backbone, teacher-side)
+    src/userdevice_rtus/      the package: architectures, CLI, and
+      tools/                  the verdict harness and data generators
     configs/                  traiNNer-redux configs, per stage and tier
-    scripts/                  data generation, teacher targets, ONNX export
-    eval/                     the verdict harness (sweep, face gate, probe)
+    scripts/                  host-side helpers (build corpus, fetch assets)
+    k8s/                      kustomize base + example overlay
     data/                     the data CONTRACT — never the data itself
     docs/                     provenance, benchmarks, naming
 

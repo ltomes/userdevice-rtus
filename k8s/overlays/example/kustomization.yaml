@@ -1,0 +1,31 @@
+# A complete training run. This is the whole overlay -- everything else is
+# inherited from the base, and the config itself is inside the image.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+nameSuffix: -stagee-dists90-r1
+
+images:
+  - name: rtus-train:dev
+    newName: your-registry.example/rtus-train
+    newTag: "0.1.0"
+
+patches:
+  - target:
+      kind: Job
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value:
+          - rtus-train
+          - -opt
+          - /app/configs/2x_RTMoSREA_film_stageE_dists90.yml
+      - op: replace
+        path: /spec/template/spec/volumes/0
+        value:
+          name: data
+          persistentVolumeClaim:
+            claimName: rtus-data

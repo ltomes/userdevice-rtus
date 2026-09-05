@@ -26,9 +26,11 @@ from PIL import Image
 from spandrel import ModelLoader
 
 N_IMAGES = 24
-TEACHER = "/workspace/pretrained/teacher_4xNomosWebPhoto_RealPLKSR.pth"
-VAL = "/workspace/datasets/greyduck2x/val/lr"
-OUT = "/workspace/teacher_ablation.json"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+TEACHER = f"{_RTUS_ROOT}/pretrained/teacher_4xNomosWebPhoto_RealPLKSR.pth"
+VAL = f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr"
+OUT = f"{_RTUS_ROOT}/teacher_ablation.json"
 
 base_model = ModelLoader().load_from_file(TEACHER).model.eval().cuda().half()
 

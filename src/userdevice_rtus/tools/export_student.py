@@ -20,7 +20,9 @@ from safetensors.torch import load_file
 
 CKPT, NAME = sys.argv[1], sys.argv[2]
 ARCH = sys.argv[3] if len(sys.argv) > 3 else "rtmosr_l"
-OUT = "/workspace/onnx_out"
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+OUT = f"{_RTUS_ROOT}/onnx_out"
 SHAPES = {"540p": (540, 960), "720p": (720, 1280), "1080p": (1080, 1920)}
 
 BASE = dict(scale=2, ffn_expansion=2, unshuffle_mod=True, dccm=True, se=True)
@@ -28,13 +30,13 @@ BASE = dict(scale=2, ffn_expansion=2, unshuffle_mod=True, dccm=True, se=True)
 
 def build(arch):
     if arch == "rtmosr_l":
-        from rtmosr_vendored import RTMoSR
+        from userdevice_rtus.rtmosr_vendored import RTMoSR
         return RTMoSR(dim=32, n_blocks=2, **BASE)
     if arch == "rtmosr_ea_film":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         return RTMoSREA(dim=48, n_blocks=3, **BASE)
     if arch == "rtmosr_ea_film_sd":
-        from rtmosr_ea_vendored import RTMoSREA
+        from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
         return RTMoSREA(dim=64, n_blocks=6, **BASE)
     raise ValueError(f"unknown arch {arch!r} — expected rtmosr_l, "
                      f"rtmosr_ea_film or rtmosr_ea_film_sd")
@@ -57,8 +59,8 @@ for sname, (h, w) in SHAPES.items():
     print(f"exported {path}", flush=True)
 
 # parity reference on a real image at the 540p working point
-src = sorted(os.listdir("/workspace/datasets/greyduck2x/val/lr"))[0]
-img = Image.open(f"/workspace/datasets/greyduck2x/val/lr/{src}").convert("RGB")
+src = sorted(os.listdir(f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr"))[0]
+img = Image.open(f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr/{src}").convert("RGB")
 img = img.resize((960, 540), Image.BICUBIC)
 x = torch.from_numpy(np.asarray(img).astype(np.float32) / 255.0
                      ).permute(2, 0, 1)[None]

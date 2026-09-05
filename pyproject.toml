@@ -41,13 +41,19 @@ all = [
 ]
 
 [project.scripts]
-rtus-train = "userdevice_rtus.cli.train:main"
-rtus-eval = "userdevice_rtus.cli.evaluate:main"
-rtus-export = "userdevice_rtus.cli.export:main"
-rtus-facegate = "userdevice_rtus.cli.facegate:main"
-rtus-probe = "userdevice_rtus.cli.probe:main"
-rtus-gen-pairs = "userdevice_rtus.cli.gen_pairs:main"
-rtus-teacher-targets = "userdevice_rtus.cli.teacher_targets:main"
+rtus-train = "userdevice_rtus.cli:train"
+rtus-eval = "userdevice_rtus.cli:evaluate"
+rtus-export = "userdevice_rtus.cli:export"
+rtus-facegate = "userdevice_rtus.cli:facegate"
+rtus-probe = "userdevice_rtus.cli:probe"
+rtus-gen-pairs = "userdevice_rtus.cli:gen_pairs"
+rtus-teacher-targets = "userdevice_rtus.cli:teacher_targets"
+rtus-blend-targets = "userdevice_rtus.cli:blend_targets"
+rtus-info = "userdevice_rtus.cli:info"
+
+[tool.hatch.metadata]
+# The train extra references traiNNer by git URL (it is not on PyPI).
+allow-direct-references = true
 
 [build-system]
 requires = ["hatchling"]

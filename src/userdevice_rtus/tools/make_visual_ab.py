@@ -23,9 +23,10 @@ import numpy as np
 import torch
 from PIL import Image, ImageDraw
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-VAL_SETS = ["/workspace/datasets/greyduck2x_v2", "/workspace/datasets/greyduck2x"]
+from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+
+VAL_SETS = [f"{_RTUS_ROOT}/datasets/greyduck2x_v2", f"{_RTUS_ROOT}/datasets/greyduck2x"]
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ZOOM = 3
 TILE = 96          # crop size in GT pixels before zoom
@@ -35,7 +36,7 @@ LABEL_H = 22
 
 def build_model(arch, ckpt):
     from safetensors.torch import load_file
-    from rtmosr_ea_vendored import RTMoSREA
+    from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
     dims = {"rtmosr_ea_film": (48, 3), "rtmosr_ea_film_sd": (64, 6)}
     if arch not in dims:
         raise ValueError(arch)
@@ -93,7 +94,7 @@ def main():
                          "from analyze_outliers.py so the frames we LOSE on "
                          "get looked at, rather than an arbitrary sample "
                          "that may contain none of them.")
-    ap.add_argument("--out", default="/workspace/visual_ab")
+    ap.add_argument("--out", default=f"{_RTUS_ROOT}/visual_ab")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
