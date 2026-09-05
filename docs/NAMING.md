@@ -1,41 +1,59 @@
 # Naming
 
-The scheme has three slots:
-
     userdevice-<family>-<version>-<shape>
 
-- **`userdevice`** — the MAKE. Fixed. Names the suite, not this model.
-- **`<family>`** — the model family. **NOT YET CHOSEN**, tracked in this
-  repo as the literal token `FAMILY_NAME_PENDING`. Run
-  `scripts/set-family-name.sh <name>` to stamp it everywhere at once.
+- **`userdevice`** — the MAKE. Fixed; names the suite, not this model.
+- **`<family>`** — **`rtus`**. See the decision below.
 - **`<version>`** — semver. Release 0.0.1 shipped as `userdevice-0.0.1-*`,
   before the family slot existed; read that stem as legacy make+version.
 - **`<shape>`** — input tier: `540p`, `720p`, `1080p`.
 
+Written **RTUS** in prose, `rtus` in artifact stems and paths — matching
+every other stem in the project, which is lowercase.
+
+## The decision: RTUS — Real Time Upscale
+
+The family is named for the thing that distinguishes it: it targets a
+**frame rate on named hardware**. Most super-resolution models optimise a
+quality metric and never report a frame time at all; this line treats the
+frame budget as the constraint and spends quality inside it. The name says
+so out loud.
+
+The positioning that follows from the name, and that should appear wherever
+the model is described:
+
+1. Name the **target hardware** — Jetson Thor class, TensorRT FP16.
+2. State the **achieved throughput** at each shape, from measurement.
+3. Say that real time **is the goal**, not a side effect — and that most
+   competing models do not target it at all.
+
+### `rtus` over `rtu`
+
+`RTU` is a heavily-used initialism elsewhere: Remote Terminal Unit in SCADA
+and industrial control, and Modbus RTU. `rtus` keeps the meaning without
+landing on that collision.
+
+### Why this does not violate the earlier "not a description" rule
+
+An earlier draft of this file argued for a name rather than a description.
+That was aimed at candidates like "upscale" — a capability **both** model
+lines share, which therefore distinguishes nothing. `rtus` names the
+*constraint* this line is built around, and the face-restoration line does
+not share it: that line has a large per-pixel budget and optimises identity
+preservation, not throughput. The two stay distinct.
+
 ## What the family name has to do
 
-It has to distinguish this line from the face-restoration line. Both models
-upscale, so **the family name cannot be "upscale"** or any word the two
-share — that would leave the other line no name to take, and would imply it
-is a variant of this one when they are separate lines with different
-architectures, teachers and budgets.
-
-The axis that actually separates them is scope and budget:
-
-| | This line | Face line |
+| | This line (RTUS) | Face line |
 |---|---|---|
 | Touches | every pixel, whole frame | a detected region only |
-| Budget | hard 38 ms real-time, Thor-class hardware | large per-pixel budget |
-| Constraint | speed | identity preservation |
+| Budget | hard 38 ms real-time, Thor class | large per-pixel budget |
+| Constraint | throughput | identity preservation |
 
-## Constraints on the choice
+## Rejected
 
-- One word. A name, not a description.
-- No "upscale", "SR", "video", or "2x" in it — the make and version already
-  say it is a model, and the shape suffix says what it takes.
-- Must leave a sibling name available for the face line.
-
-Rejected so far: **Halide** (collides with halide-lang), **Aperture**
-(Valve), **Reel/Telecine/Nitrate/Emulsion** (they name film, and the
-training content turned out to be photographs — see `data/README.md`),
-**Kestrel** and the small-raptor convention (operator declined).
+**Halide** (collides with halide-lang), **Aperture** (Valve),
+**Reel / Telecine / Nitrate / Emulsion** (they name film, and the training
+content turned out to be photographs — see `data/README.md`), **Kestrel**
+and the small-raptor convention, and bare **upscale** (shared by both lines,
+so it distinguishes nothing).
