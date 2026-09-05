@@ -72,3 +72,22 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Vendored from upstream: rtmosr_vendored.py from RTMoSR (MIT),
+# realplksr_vendored.py from neosr (Apache-2.0), rtmosr_ea_vendored.py built
+# on the first. These are kept CLOSE TO UPSTREAM on purpose -- so they can be
+# diffed against the original, and so the third-party attribution in NOTICE
+# describes code a reader can recognise. Reformatting them to our line length
+# would cost both and buy nothing.
+"src/userdevice_rtus/*_vendored.py" = ["E501", "E741", "E401", "F401"]
+
+# tools/ are scripts, not library modules. Several manipulate sys.path before
+# importing, which is E402 by construction rather than by mistake.
+# E501/F401/E741 here are PRE-EXISTING debt, not policy -- they are ignored so
+# the gate is green and meaningful today, and a cleanup ticket removes them.
+"src/userdevice_rtus/tools/*" = ["E402", "E501", "F401", "E741"]
+
+# The CLI imports inside functions deliberately: rtus-info must REPORT a
+# missing optional dependency rather than fail to start because of one.
+"src/userdevice_rtus/cli.py" = ["E402"]
