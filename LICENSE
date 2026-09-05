@@ -1,0 +1,83 @@
+MIT License
+
+Copyright (c) 2026 userDevice
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+THIRD-PARTY NOTICES
+================================================================================
+
+This project incorporates or derives from the following works. See
+docs/PROVENANCE.md for the full record and the evidence for each.
+
+--------------------------------------------------------------------------------
+RTMoSR — MIT License
+https://github.com/rewaifu/RTMoSR
+
+`src/userdevice_rtus/rtmosr_vendored.py` is derived from RTMoSR, and
+`rtmosr_ea_vendored.py` builds on it. Distributed under the MIT License, the
+full text of which is reproduced above and applies to that code.
+
+--------------------------------------------------------------------------------
+neosr — Apache License 2.0
+https://github.com/neosr-project/neosr
+
+`src/userdevice_rtus/realplksr_vendored.py` is derived from neosr's
+realplksr_arch.py (itself descended from spandrel's PLKSR/RealPLKSR, with
+modifications by umzi2). Licensed under the Apache License, Version 2.0. You
+may obtain a copy at http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+traiNNer-redux — Apache License 2.0
+https://github.com/the-database/traiNNer-redux
+
+Used as the training framework and as the source of the metric
+implementations used for evaluation. Licensed under the Apache License,
+Version 2.0.
+
+--------------------------------------------------------------------------------
+4xNomosWebPhoto_RealPLKSR — CC BY 4.0
+Philip Hofmann (Phhofm)
+https://huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR
+
+The models produced by this repository are DISTILLED FROM this teacher model
+by Philip Hofmann, licensed under Creative Commons Attribution 4.0
+International (CC BY 4.0). https://creativecommons.org/licenses/by/4.0/
+
+This attribution is required by that licence and applies to the released
+weights as well as to this source tree.
+
+Note: the teacher's GitHub release page states its licence as "CC-BY-0.4",
+which is not a valid Creative Commons version. The author's own Hugging Face
+model card declares `cc-by-4.0`, which is the reading applied here.
+
+--------------------------------------------------------------------------------
+Nomos-v2 / NomosRealWeb dataset
+
+Training data is generated from the public NomosRealWeb release (Nomos-v2 high
+resolution images). No images from it are redistributed by this repository.
+The dataset's own licence terms were not stated by its publisher at the time
+of writing; see docs/PROVENANCE.md.
+
+--------------------------------------------------------------------------------
+SCRFD (InsightFace)
+
+The face gate uses an SCRFD detector checkpoint, which is fetched at use time
+and is not redistributed here.

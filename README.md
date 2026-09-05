@@ -114,3 +114,15 @@ release cites the commit it was trained from.
 Read `docs/PROVENANCE.md`. Every code dependency is permissive (MIT /
 Apache-2.0) and the teacher is CC-BY-4.0, so the model is releasable — but
 attribution to Philip Hofmann is **required**, not optional.
+
+## Licence and attribution
+
+Code in this repository is **MIT** (see `LICENSE`).
+
+The released models are **distilled from `4xNomosWebPhoto_RealPLKSR` by
+Philip Hofmann**, licensed CC BY 4.0. That attribution is required by the
+teacher's licence and carries to the weights, not just to this source tree.
+
+Third-party notices for RTMoSR (MIT), neosr and traiNNer-redux (Apache-2.0)
+are in `LICENSE`; the full provenance record, including the one open item, is
+in `docs/PROVENANCE.md`.
