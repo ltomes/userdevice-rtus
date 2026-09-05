@@ -59,3 +59,33 @@ if it is in this lineage would be a third-party origin.
 Do not write a licence, permission, or exception into this file that
 cannot be quoted from its source. An inferred permission outlives the
 session that guessed it.
+
+---
+
+## Weight lineage — RESOLVED 2026-09-05
+
+The release line inherits **no third-party weights**. Traced by reading
+`pretrain_network_g` in every config of the chain:
+
+    2x_RTMoSREA_film_stageA.yml       pretrain_network_g: ~   <- from scratch
+    2x_RTMoSREA_film_sd_stageA.yml    pretrain_network_g: ~   <- from scratch
+      stageC / stageD1 / stageD2 / stageE_dists90
+      sd_stageC_dists90(_ext)
+        -> all initialise from our own stage-A net_g_ema_150000.safetensors
+
+Corroborated in `log.md`: :1036 "from-scratch charbonnier", :574 "Both need
+from-scratch stage-A", :1208 "(iter 10,000, from-scratch, no [pretrain])".
+
+This closes what was recorded above as an open blocking item. The earlier
+concern — an "RTMoSR-L fine-tune from released 2x weights" noted in the
+2026-08-16 log — belongs to a **different and superseded line**
+(`2x_RTMoSR_L_greyduck`), which did initialise from a third-party
+`pretrained/2x_RTMoSR_L.pth`. Those configs have been removed from this
+repository precisely so that lineage cannot be confused with the release
+line or contaminate its provenance. If that line is ever revived, its
+third-party weight origin must be resolved first.
+
+**Still open** (see the tables above): the origin of `rtmosr_vendored.py`,
+the licence of `4xNomosWebPhoto_RealPLKSR`, the licence of the NomosRealWeb
+release, and the neosr licence behind `realplksr_vendored.py`. Those are
+about *code and teacher*, not weights.
