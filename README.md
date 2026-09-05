@@ -74,7 +74,7 @@ benchmark sets are out-of-distribution for a codec-trained model.
 
 ## Layout
 
-    src/userdevice_upscale/   architectures (student, backbone, teacher-side)
+    src/userdevice_rtus/     architectures (student, backbone, teacher-side)
     configs/                  traiNNer-redux configs, per stage and tier
     scripts/                  data generation, teacher targets, ONNX export
     eval/                     the four-leg verdict harness
