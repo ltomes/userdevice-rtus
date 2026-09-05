@@ -84,8 +84,13 @@ def info() -> None:
     from userdevice_rtus import paths
 
     print(f"userdevice-rtus     tiers: {', '.join(sorted(rtus.TIERS))}")
-    print(f"traiNNer registry   {'YES' if rtus.USING_REAL_REGISTRY else 'NO'}"
-          f"  ({'training available' if rtus.USING_REAL_REGISTRY else 'EVAL/EXPORT ONLY — cannot train'})")
+    registry = "YES" if rtus.USING_REAL_REGISTRY else "NO"
+    capability = (
+        "training available"
+        if rtus.USING_REAL_REGISTRY
+        else "EVAL/EXPORT ONLY — cannot train"
+    )
+    print(f"traiNNer registry   {registry}  ({capability})")
     print(f"RTUS_DATA_ROOT      {paths.DATA_ROOT}")
     for label, p in [
         ("datasets", paths.DATASETS),

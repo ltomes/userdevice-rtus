@@ -50,7 +50,6 @@ import numpy as np
 import torch
 from PIL import Image, ImageFilter
 
-
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
 VAL_SETS = [f"{_RTUS_ROOT}/datasets/rtus2x_v2", f"{_RTUS_ROOT}/datasets/rtus2x"]
@@ -64,6 +63,7 @@ SR_FLOOR = 2.0       # SR must carry real structure to be judged at all
 
 def build_model(arch, ckpt):
     from safetensors.torch import load_file
+
     from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
     dims = {"rtmosr_ea_film": (48, 3), "rtmosr_ea_film_sd": (64, 6)}
     dim, nb = dims[arch]

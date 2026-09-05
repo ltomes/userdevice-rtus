@@ -17,14 +17,19 @@ import os
 import sys
 
 import numpy as np
+import onnxruntime as ort
 import torch
 from PIL import Image
-
-import onnxruntime as ort
-from userdevice_rtus.tools.facegate.scrfd_decode import (
-    INPUT_SIZE, NMS_THRESH, decode_scrfd, nms,
-    preprocess, unscale)
 from safetensors.torch import load_file
+
+from userdevice_rtus.tools.facegate.scrfd_decode import (
+    INPUT_SIZE,
+    NMS_THRESH,
+    decode_scrfd,
+    nms,
+    preprocess,
+    unscale,
+)
 
 SR_THRESH = 0.5   # strict: what counts as "a face" in model output
 GT_THRESH = 0.2   # lenient: what counts as "there was a face" in source

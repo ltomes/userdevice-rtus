@@ -21,6 +21,7 @@ Fetch the detector with `scripts/fetch_assets.sh`.
 """
 
 from __future__ import annotations
+
 import argparse
 import math
 from pathlib import Path

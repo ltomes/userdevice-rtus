@@ -28,7 +28,6 @@ import sys
 import numpy as np
 import torch
 from PIL import Image
-
 from traiNNer.archs.lpips_arch import LPIPS
 from traiNNer.losses.dists_loss import DISTSLoss
 from traiNNer.metrics.psnr_ssim import calculate_psnr, calculate_ssim

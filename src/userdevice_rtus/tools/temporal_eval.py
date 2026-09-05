@@ -21,9 +21,15 @@ CONTROLS (both must behave sensibly or the metric is not trustworthy):
     near the floor. If bicubic scores high the metric is broken.
   - gt_vs_gt: ground truth against itself = 0 by construction, a sanity zero.
 """
-import glob, json, os, re, sys
+import glob
+import json
+import os
+import re
+import sys
 from collections import defaultdict
-import numpy as np, torch
+
+import numpy as np
+import torch
 from PIL import Image
 from safetensors.torch import load_file
 
@@ -96,7 +102,7 @@ print(f"{'candidate':<14} {'flicker':>9} {'vs bicubic':>11}")
 for k in order:
     v = np.mean(acc[k])
     print(f"{k:<14} {v:9.4f} {(v-base)/base*100:+10.1f}%")
-print(f"\ncontrol gt_vs_gt = 0.0000 (sanity zero)")
+print("\ncontrol gt_vs_gt = 0.0000 (sanity zero)")
 json.dump({k: float(np.mean(v)) for k, v in acc.items()},
           open(OUT, "w"), indent=1)
 print(f"wrote {OUT}")
