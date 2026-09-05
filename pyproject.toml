@@ -1,7 +1,7 @@
 [project]
 name = "userdevice-rtus"
 version = "0.1.0.dev0"
-description = "userDevice RTUS — real-time 2x video upscaling for constrained GPUs"
+description = "userDevice RTUS — 2x video upscaling under a hard real-time frame budget"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

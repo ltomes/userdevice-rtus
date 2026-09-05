@@ -8,7 +8,7 @@ server, no mounts, and no missing-image boxes.
 Panels are re-encoded to JPEG and width-capped, because a 4-column PNG panel
 is several MB and a dozen of them will not fit in a single page.
 
-Usage (inside greyduck-train:dev, cwd /workspace):
+Usage (inside the container image, cwd /workspace):
   python make_report.py --metrics results/x.json --panels visual_ab_30k \
       --title "stage-C @30k" --out /workspace/report.html
 """

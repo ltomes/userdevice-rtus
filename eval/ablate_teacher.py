@@ -14,7 +14,7 @@ Ablations:
   C. depth truncation: keep first k blocks only.
   D. EA attention -> identity everywhere (instance modulation contribution).
 
-Runs on ms A5000 in greyduck-train:dev, ~2 GB VRAM, light IO (N images).
+Runs in the container image, ~2 GB VRAM, light IO (N images).
 """
 import copy
 import glob

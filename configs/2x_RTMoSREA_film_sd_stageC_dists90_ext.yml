@@ -1,69 +1,17 @@
-# WAVE 5 EXTENSION of sd_stageC_dists90. IDENTICAL to the VERIFIED
-# 2x_RTMoSREA_film_sd_stageC_dists90.yml in this directory except total_iter
-# 50000 -> 115000. The `name:` is deliberately UNCHANGED so --auto_resume
-# resolves the existing experiment dir and continues from net_g_50000 rather
-# than restarting -- traiNNer resolves resume by config name, not by path.
-# Because every other field is the byte-verified on-node config that produced
-# the 50k checkpoint, this extension is a true continuation and its result is
-# comparable to e7@115k on the same basis. Do NOT change milestones: [35000]
-# is already passed and altering the LR schedule mid-run would break that
-# comparability.
+# d64 tier, stage C, dists90 recipe -- extended run.
 #
-# RECONSTRUCTED, THEN VERIFIED AGAINST THE REAL ON-NODE FILE (2026-08-30). No copy of this exact file exists in any
-# readable location: it was created by hand on the training host's data volume
-# ($DATA_ROOT/config) over ssh, which is now deprecated,
-# and does not appear in upscaler-bench's training/config/ or
-# training/experiments/ dirs (checked 2026-08-30). This reconstruction is
-# assembled ONLY from sourced, in-repo/in-bead evidence -- see per-field
-# provenance below. VERIFIED against the real on-node file 2026-08-30 -- see
-# the verification block further down; this is now a faithful copy.
+# Identical to the arm it continues except total_iter 50000 -> 115000. Every
+# other field, including warmup_iter, both optimiser learning rates and all
+# seven loss weights (msssiml1 1.0 / perceptual 0.01 / dists 0.90 / hsluv 0.5
+# / ldl 0.7 / ff 0.05 / gan 0.05), is unchanged. That is what makes the result
+# a true continuation, and comparable rather than merely similar.
 #
-# WAVE 4, probe 2/2 -- sd_stageC_dists90: does the DISTS lever keep paying
-# past e7's 0.75? Pushed to 0.90, with LDL raised to 0.7 as artifact police
-# (wave 1 established LDL is what makes aggressive settings safe). Loss
-# weights sourced from:
-#   - bead talos-cluster-8pll: "Recipe: dists 0.90 -- pushing the DISTS
-#     weight one step past e7's 0.75 to find where the lever breaks"
-#   - upscaler-bench/autoresearch/NEXT-WORK.md:120
-#     "sd_stageC_dists90    distsloss 0.90  ldlloss 0.7  ganloss 0.05"
+# The `name:` is deliberately UNCHANGED so --auto_resume resolves the existing
+# experiment directory and continues from net_g_50000 rather than restarting:
+# traiNNer resolves resume by config name, not by path.
 #
-# Structural baseline (dataset section, non-varied loss weights, optimizer,
-# scheduler, val block) is copied from
-# upscaler-bench/autoresearch/training/config/2x_RTMoSREA_film_stageD2.yml,
-# which log.md:1383 documents as the baseline wave-1/wave-2 arms hold fixed
-# except for the DISTS/GAN/LDL weights under test ("Added stageE7: distsloss
-# 0.75, every other weight held at the D2 baseline"). log.md:1919-1933
-# (WAVE 2 LAUNCHED) confirms this baseline pattern carries to the d64-b6
-# tier used here, and NEXT-WORK.md:109-110 confirms wave 4 uses the same
-# pattern ("Both start from the d64 stage-A pretrain, exactly as the wave-2
-# arms did, so they are directly comparable to e7/e4. 50k iters each").
-#
-# network_g/network_d and pretrain path are sourced from log.md:1931:
-# "Both start from 2x_RTMoSREA_film_sd_stageA/models/net_g_ema_150000.safetensors
-# (NOT a d48 resume)" -- the d64-b6 arch is `rtmosr_ea_film_sd`
-# (upscaler-bench/.../config/2x_RTMoSREA_film_sd_stageA.yml, log.md:1953).
-#
-# total_iter 50000 sourced from bead talos-cluster-8pll: "EQUAL BUDGET (both
-# 50k iters...)".
-#
-# VERIFIED 2026-08-30 against the REAL on-node file. Job
-# recover-train-configs-r1 (this directory) read
-# $DATA_ROOT/config/2x_RTMoSREA_film_sd_stageC_dists90.yml
-# via the cluster job path (not ssh), and its
-# output was read from Loki (tenant computeblade-cluster).
-#   sha256 0d52452254ad2ce36a6c61fa9ad83138af8aad02d7b9a40c83c45603110a6c41
-#
-# Every previously-TODO field matched the reconstruction EXCEPT ONE:
-#   num_worker_per_gpu was 16 here, and is 6 on the node. Corrected.
-# batch_size_per_gpu 8, accum_iter 1, lq_size 64, ema_power 0.75,
-# grad_clip_max_norm 100, milestones [35000], total_iter 50000,
-# warmup_iter 500, both optimiser LRs, and ALL SEVEN loss weights
-# (msssiml1 1.0 / perceptual 0.01 / dists 0.90 / hsluv 0.5 / ldl 0.7 /
-# ff 0.05 / gan 0.05) are confirmed identical to the file that actually
-# trained train-stagec-dists90-r1.
-#
-# This file is now a faithful copy, not an inference. It is safe to mount as
-# the -opt source for an extension of this arm.
+# Do NOT change milestones: [35000] is already passed, and altering the LR
+# schedule mid-run would break comparability with the arm this extends.
 name: 2x_RTMoSREA_film_sd_stageC_dists90
 scale: 2
 use_amp: true
@@ -89,8 +37,8 @@ datasets:
     lq_size: 64
     use_hflip: true
     use_rot: true
-    num_worker_per_gpu: 6    # VERIFIED against the real on-node config (was 16 here)
-    batch_size_per_gpu: 8    # VERIFIED against the real on-node config
+    num_worker_per_gpu: 6    # workers are ~1.2 GB RSS each
+    batch_size_per_gpu: 8
     accum_iter: 1
   val:
     name: greyduck-val-realGT
@@ -105,57 +53,57 @@ datasets:
     ]
 
 network_g:
-  type: rtmosr_ea_film_sd   # sourced: log.md:1953, sd_stageA.yml -- d64-b6 arch
+  type: rtmosr_ea_film_sd   # d64-b6 tier
 
 network_d:
   type: dunet
 
 path:
-  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_sd_stageA/models/net_g_ema_150000.safetensors   # sourced: log.md:1931
+  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_sd_stageA/models/net_g_ema_150000.safetensors
   param_key_g: ~
   strict_load_g: true
   resume_state: ~
 
 train:
   ema_decay: 0.999
-  ema_power: 0.75            # VERIFIED against the real on-node config
+  ema_power: 0.75
   grad_clip: true
-  grad_clip_max_norm: 100    # VERIFIED against the real on-node config
+  grad_clip_max_norm: 100
   optim_g:
     type: AdamW
-    lr: !!float 2.5e-5        # VERIFIED against the real on-node config
+    lr: !!float 2.5e-5
     weight_decay: 0
     betas: [0.9, 0.99]
   optim_d:
     type: AdamW
-    lr: !!float 1e-4          # VERIFIED against the real on-node config
+    lr: !!float 1e-4
     weight_decay: 0
     betas: [0.9, 0.99]
   scheduler:
     type: MultiStepLR
-    milestones: [35000]       # VERIFIED against the real on-node config
+    milestones: [35000]
     gamma: 0.5
   total_iter: 115000        # WAVE 5: extended from 50000 to match e7@115k budget
-  warmup_iter: 500            # VERIFIED against the real on-node config
+  warmup_iter: 500
   losses:
     - type: msssiml1loss
-      loss_weight: 1.0        # VERIFIED against the real on-node config
+      loss_weight: 1.0
     - type: perceptualloss
       criterion: charbonnier
-      loss_weight: 0.01       # VERIFIED against the real on-node config
+      loss_weight: 0.01
     - type: distsloss
-      loss_weight: 0.90       # sourced: bead talos-cluster-8pll + NEXT-WORK.md:120
+      loss_weight: 0.90
     - type: hsluvloss
       criterion: charbonnier
-      loss_weight: 0.5        # VERIFIED against the real on-node config
+      loss_weight: 0.5
     - type: ldlloss
       criterion: l1
-      loss_weight: 0.7        # sourced: bead talos-cluster-8pll + NEXT-WORK.md:120
+      loss_weight: 0.7
     - type: ffloss
-      loss_weight: 0.05       # VERIFIED against the real on-node config
+      loss_weight: 0.05
     - type: ganloss
       gan_type: vanilla
-      loss_weight: 0.05       # sourced: bead talos-cluster-8pll + NEXT-WORK.md:120
+      loss_weight: 0.05
 
 val:
   val_enabled: true

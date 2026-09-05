@@ -1,7 +1,7 @@
 """Texture gain vs invented structure — the two axes of a texture push.
 
 The face gate answers one question well ("did we draw a face that isn't
-there?"). The user's constraint is broader: chase more texture detail, but
+there?"). The project's constraint is broader: chase more texture detail, but
 reject detail the model invented rather than recovered. This measures both
 axes at once so a texture push can be judged instead of guessed at:
 
@@ -37,7 +37,7 @@ Scoring the teacher alongside our students is the point — it tells us
 whether the model we distil from is itself over-inventing, which the user
 observed by eye on 2026-08-22.
 
-Usage (inside greyduck-train:dev, cwd /workspace):
+Usage (inside the container image, cwd /workspace):
   python hallucination_probe.py --n 60 \
       --ckpt stageC=<path>:rtmosr_ea_film [--out results/x.json]
 """

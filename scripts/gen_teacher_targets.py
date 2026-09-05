@@ -6,7 +6,7 @@ attenuates GAN hallucination (research agent, 2026-08-16). Teacher was
 trained WITH noise injection so it denoises — stage B2 finishes on real GT
 to restore grain (ECO-style staged annealing).
 
-Runs on ms in greyduck-train:dev; shares the GPU with stage-A (student
+Runs in the container image; shares the GPU with stage-A (student
 training uses ~6%). Idempotent — skips existing outputs.
 """
 import glob

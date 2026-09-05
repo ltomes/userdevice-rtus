@@ -1,4 +1,4 @@
-# Training image for Greyduck upscaler students (runs on ms, RTX A5000).
+# Training image for the RTUS students. Single CUDA GPU.
 # traiNNer-redux deps baked in; the live repo is bind-mounted at runtime so
 # code edits don't need a rebuild.
 FROM pytorch/pytorch:2.12.1-cuda12.6-cudnn9-runtime

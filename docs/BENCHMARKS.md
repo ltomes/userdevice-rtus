@@ -1,10 +1,10 @@
 # Benchmarks
 
-## What already exists (internal, four legs)
+## What already exists (internal)
 
 The analysis chain in `eval/` is the project's existing verdict harness and
 is stronger than what most published SR models ship. Every wave verdict ran
-all four legs on identical frames:
+these legs on identical frames:
 
 1. **Sweep** — `eval_compare.py`: PSNR, SSIM, DISTS, LPIPS across every
    checkpoint, against bicubic (floor) and the teacher (reference), picking
@@ -14,6 +14,8 @@ all four legs on identical frames:
 2. **Face gate** — `facegate/face_gate.py`, BLOCKING. Zero tolerance for
    face-region violations.
 3. **Temporal** — flicker on adjacent frames, against a bicubic control.
+   NOTE: this leg is part of the project's verdict process but its
+   implementation is NOT in this repository.
 4. **Invention probe** — `hallucination_probe.py`: what fraction of
    high-frequency detail the student invents rather than recovers. The kill
    condition is inventing more than the teacher (8.50%).

@@ -2,7 +2,7 @@
 # Same from-scratch fidelity pretrain recipe as 2x_RTMoSREA_film_stageA;
 # only the geometry differs (dim=64, n_blocks=6 -> 33.9M params, 18.5 ms
 # @720p on Thor: fits the 38 ms film budget only at <=540p-class inputs,
-# per size-probe results 2026-08-20). Honors the user's directive to spend
+# per size-probe results 2026-08-20). Spends
 # quality where the low-res performance band allows it.
 # Launch AFTER 2x_RTMoSREA_film_stageA finishes (shared GPU, run serially).
 name: 2x_RTMoSREA_film_sd_stageA

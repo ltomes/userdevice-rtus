@@ -42,7 +42,7 @@ grain.
 
 It was not trained on film, television, or any private media library. The
 `_film` in the config names denotes a **latency tier** -- the 38 ms budget
-of a 24fps frame -- not the content. Motion in the corpus is synthetic and
+budget inside the 41.7 ms of a 24fps frame -- not the content. Motion in the corpus is synthetic and
 the HR frames are photographs. Any claim to the contrary in a model card
 would be false.
 

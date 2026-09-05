@@ -1,6 +1,6 @@
 """Side-by-side val previews: bicubic | pretrained RTMoSR-L | smoke-2k | HR.
 
-Runs on ms in greyduck-train:dev (GPU shared with the training container —
+Runs in the container image (GPU shared with the training container —
 tiny inference, memory-capped). Outputs labeled JPEG strips + zoom crops to
 preview/ for remote (artifact) viewing.
 """

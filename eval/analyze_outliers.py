@@ -15,7 +15,7 @@ Consumes the --per-image JSON that eval_compare.py writes, and reports:
   BEST vs TEACHER  where we win hardest — worth knowing so a texture push
                    does not regress what already works.
 
-Usage (inside greyduck-train:dev, cwd /workspace):
+Usage (inside the container image, cwd /workspace):
   python analyze_outliers.py results/x-perimage.json \
       --ours iter050000 --metric dists [--top 12]
 """

@@ -1,57 +1,43 @@
-# userDevice film-tier d48-b3, probe stageE_dists90: WAVE-4 dists90 RECIPE
-# AT d48 CAPACITY (equal-budget rerun of wave-1 E7, x86/ms arm).
+# d48 tier, stage E: the dists90 recipe at d48 capacity.
 #
-# WHY THIS CONFIG EXISTS (autoresearch/log.md, promotion note + wave-1/wave-3):
-#   - the SHIPPED 1080p tier is still d48, still running wave-1's E7 recipe
-#     (distsloss 0.75, everything else at the D2 baseline) -- log.md:
-#     "wave-1 best E7 (d48, 65k) | -10.35% | -6.64% | ... | PASS"
-#   - every newer recipe (the gan+ldl mechanism from E4, the dists90 lever
-#     tested past 0.75) was only ever trained at d64 capacity. d64 was
-#     measured a <=720p tier at 78.5 ms @1080p (2026-08-20 size probe;
-#     38 ms film budget) -- NOT a 1080p tier.
-#   - this config asks: does the dists90 recipe (distsloss 0.90, ganloss 0.05,
-#     ldlloss 0.7 -- autoresearch/NEXT-WORK.md "Verified weights" table,
-#     `sd_stageC_dists90   distsloss 0.90  ldlloss 0.7  ganloss 0.05`) buy the
-#     same kind of gain at d48 that E7 (dists 0.75) bought over the D2
-#     baseline, when trained for the SAME iteration budget?
+# WHY THIS CONFIG EXISTS
+#   - The shipped 1080p tier is d48, running the earlier E7 recipe
+#     (distsloss 0.75, everything else at the stage-D2 baseline).
+#   - Every newer recipe -- the gan+ldl mechanism, and the dists90 lever
+#     pushed past 0.75 -- had only ever been trained at d64 capacity. But d64
+#     measures ~78.5 ms at 1080p against a 38 ms budget, making it a <=720p
+#     tier, not a 1080p one. So none of those gains had ever reached the
+#     tier that actually ships at 1080p.
+#   - This config asks whether the dists90 recipe (distsloss 0.90,
+#     ganloss 0.05, ldlloss 0.7) buys the same kind of gain at d48 that the
+#     E7 recipe bought over the D2 baseline, at the SAME iteration budget.
 #
-# NOTE: WAVE 4 DID RUN. Both NEXT-WORK.md ("Nothing here has been launched")
-# and log.md (ends at the wave-3 d64 e7-120k entry) are STALE on this point --
-# do not take either as current. Measured on the cluster 2026-08-29 via
-# k8s-ops.sh get jobs -n ml: train-stagec-hybrid-r1 and train-stagec-dists90-r1
-# both Complete (4h47m each); analyze-stagec-hybrid-r1 and
-# analyze-stagec-dists90-r1 both Complete. Verdicts are in beads
-# talos-cluster-qpt (hybrid) and talos-cluster-8pll (dists90).
-#
-# dists90 at d64 measured: dists 0.12939, lpips 0.14467, temporal 5.8386,
+# WHAT MOTIVATED IT: dists90 at d64 measured dists 0.12939, lpips 0.14467,
 # invention 6.69% (below the teacher's 8.50% kill bar, and the lowest of the
-# three arms), face gate PASS 0/60. Its best checkpoint was its LAST, so it
-# had not converged. That result -- not a plan -- is why this recipe is worth
-# porting to d48. The d48 OUTCOME is what this arm tests and is unknown.
+# three arms tried), face gate PASS 0/60. Its best checkpoint was its last,
+# so it had not converged. That measured result -- not a plan -- is why the
+# recipe was worth porting down to d48. The d48 outcome is what this arm
+# tests, and it was unknown when this config was written.
 #
-# ONLY the recipe changes vs the wave-1 E7 arm. Every other field in this
-# file is copied byte-for-byte from
-# autoresearch/training/config/2x_RTMoSREA_film_stageD2.yml, which is the
-# exact base E7 was probed from (log.md: "wave-1 probe therefore SEEDS its
-# own experiment dir from D2@50000 (`seed_resume.sh`) and uses `auto_resume`").
-#   - distsloss 0.45 -> 0.90   (dists90 recipe; E7 used 0.75)
-#   - ganloss   stays 0.05     (D2's own value; dists90 recipe keeps it at 0.05)
-#   - ldlloss   0.5  -> 0.7    (dists90 recipe's artifact-police raise, proven
-#                                mechanism from E3->E4: log.md "ldl makes gan
-#                                safe")
-# Nothing else is touched: same datasets, same architecture, same optimizer/
-# scheduler, same pretrain checkpoint, same val cadence.
+# ONLY THE RECIPE CHANGES. Every other field is copied from the stage-D2
+# config, which is the base the E7 arm was probed from:
+#   - distsloss 0.45 -> 0.90   (E7 used 0.75)
+#   - ganloss   stays 0.05     (D2's own value)
+#   - ldlloss   0.5  -> 0.7    (the artifact-police raise; ldl is what makes
+#                               the gan term safe)
+# Same datasets, architecture, optimiser, scheduler, pretrain checkpoint and
+# validation cadence.
 #
-# BUDGET: total_iter 65000 = the exact wave-1 E7 endpoint (log.md's E7 rows
-# are all reported at "iter065000"; D2's own total_iter is 50000, so this is
-# D2@50000 + 15000 new iters -- the same 15,000-iter probe budget every
-# wave-1 probe used, per log.md "Wave-1 budget from measurement... 15,000
-# iters @ 4.0 it/s"). resume_state below points at THIS experiment's own
-# seeded 50000.state -- it must be seeded before launch (see
-# 2x_RTMoSREA_film_stageE_dists90-LAUNCH.md, step 1) because traiNNer's
-# check_resume() resolves weights by config NAME, not by resume_state path
-# (log.md: "check_resume ... builds weight paths from
-# experiments/<opt.name>/models").
+# BUDGET: total_iter 65000 is the E7 endpoint, and D2's own total_iter is
+# 50000 -- so this is D2@50000 plus a 15,000-iter probe, the same probe budget
+# the earlier arms used. That equal budget is the whole point: it makes the
+# comparison a recipe test rather than a duration test.
+#
+# GOTCHA: resume_state points at this experiment's own seeded 50000.state and
+# must be seeded before launch. traiNNer's check_resume() resolves weights by
+# config NAME, not by the resume_state path -- it builds them from
+# experiments/<name>/models -- so a resume_state pointing somewhere else is
+# silently ignored.
 #
 # Every ckpt from this run MUST pass facegate/face_gate.py (exit 0) before
 # promotion -- zero tolerance for generated faces (same rule as stage C/D2).
@@ -81,13 +67,10 @@ datasets:
     lq_size: 64
     use_hflip: true
     use_rot: true
-    # MEASURED on ms 2026-08-30: `free -g` reports 62 total / 43 used /
-    # 18 AVAILABLE, with ZFS ARC holding 8.3 GB. D2's inherited value of 16
-    # workers at Thor's measured ~1.2 GB/worker is ~19 GB -- more than ms has
-    # available, on the household server. Reduced to 4, which is what the
-    # d64 tier's own 2x_RTMoSREA_film_sd_stageA.yml uses. Do NOT raise this
-    # without re-reading `free -g` first; ms is not Thor and cannot be
-    # allowed to OOM.
+    # Dataloader workers cost ~1.2 GB RSS each, measured. The inherited value
+    # of 16 is therefore ~19 GB of workers alone, which will OOM a training
+    # host that is doing anything else. Reduced to 4, matching the d64 tier's
+    # stage-A config. Check free memory before raising this.
     num_worker_per_gpu: 4
     batch_size_per_gpu: 8
     accum_iter: 1

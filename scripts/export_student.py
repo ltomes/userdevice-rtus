@@ -8,7 +8,7 @@ students. The film tier is a DIFFERENT architecture (RTMoSREA, dim 48 /
 quality work had produced a checkpoint with no path to a deployable engine.
 Writes: onnx_out/<outname>-{540p,720p,1080p}.onnx
         onnx_out/<outname>-parity.npz  (fixed real input + torch fp32 output)
-Runs on ms in greyduck-train:dev (CPU is fine for RTMoSR).
+Runs in the container image (CPU is fine for RTMoSR).
 """
 import os
 import sys

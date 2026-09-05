@@ -1,13 +1,22 @@
 # userDevice RTUS — real-time 2x upscaling
 
-**The goal of this model is a frame rate, not a score.**
+**This model was *trained* for real time, not made fast afterwards.**
 
-Most super-resolution models are optimised for PSNR or perceptual metrics
-and report no frame time at all — they are built to make one image better,
-offline, at whatever cost that takes. This one is built to run **inside a
-live video pipeline on a specific piece of hardware**, and every design
-decision below is downstream of that. A quality gain that misses the frame
-budget is not a gain here; it is a regression.
+Plenty of super-resolution models end up running quickly. They get there
+after the fact — quantised, pruned, distilled, or handed to TensorRT once the
+weights already exist. The frame budget is something the deployment engineer
+inherits and fights.
+
+Here the budget came first and shaped what was trained. The architecture was
+chosen by ablating a teacher to find which of its parts survive at speed. The
+model is split into two tiers because 1080p and 540p inputs leave different
+amounts of time. The loss recipe was selected under a latency ceiling, and
+every training run was scored against one. **A quality gain that misses the
+frame budget was never a gain here — it was a rejected arm.**
+
+That is the difference this repository is about. Most models optimise a
+quality metric and report no frame time at all; this one treats the deadline
+as the constraint and spends quality inside it.
 
 ## Target hardware and measured throughput
 
@@ -20,7 +29,7 @@ CUDA-graph enabled, median `enqueueV3` GPU time, compute-only:
 |---|---|---|---|---|
 | 540p | 1080p | 6.335 ms | **158 fps** | passes a 120fps budget |
 | 720p | 1440p | 12.350 ms | **81 fps** | passes a 60fps budget |
-| 1080p | 4K | 28.742 ms | **35 fps** | fits the 38 ms 24fps film floor |
+| 1080p | 4K | 28.742 ms | **35 fps** | fits the 38 ms budget for 24fps |
 
 p95 and p99 sit within 0.2 ms of the median at every shape — the model is
 not merely fast on average, it is *steady*, which is what a playback
@@ -49,10 +58,10 @@ The d64 tier exists because at 540p the d48 model uses only 6.3 ms of a
 
 A distilled student. The teacher is `4xNomosWebPhoto_RealPLKSR` (Philip
 Hofmann, CC-BY-4.0). The student is an RTMoSR-style small-kernel backbone
-with a per-pixel EA gate on every block output — a design derived from
-ablating the teacher, which showed its quality lives in EA gating and
-collective depth, not in its 17px large kernels. So the student keeps the
-cheap fast backbone and buys depth over width. That ablation is in
+with a per-pixel EA gate on the residual branch of every backbone block — a
+design derived from ablating the teacher, which showed its quality lives in
+EA gating and collective depth, not in its 17px large kernels. So the student
+keeps the cheap fast backbone and buys depth over width. That ablation is in
 `eval/ablate_teacher.py`; it is the reason this architecture looks the way
 it does.
 
@@ -61,15 +70,27 @@ it does.
 **No film, television, or private media.** The corpus is public photographs
 (the NomosRealWeb release) with *synthesised* motion and *real* H.264
 degradation. The `_film` in the config names denotes a latency tier — the
-38 ms of a 24fps frame — not content. See `data/README.md`.
+38 ms budget inside the 41.7 ms of a 24fps frame — not content. See `data/README.md`.
 
-## Quality is measured on four legs, not one number
+## Quality is gated, not scored
 
-`eval/` holds the verdict harness: a checkpoint sweep on PSNR/SSIM/DISTS/
-LPIPS picking best-by-DISTS rather than by last iteration, a **blocking**
-face gate, a temporal flicker measurement, and an invention probe that kills
-any student hallucinating more detail than the teacher it distils from. See
-`docs/BENCHMARKS.md`, which also covers why standard bicubic-degraded
+`eval/` holds the verdict harness. A checkpoint is not accepted because a
+number went up:
+
+1. **Sweep** — PSNR/SSIM/DISTS/LPIPS across every checkpoint, selecting
+   best-by-DISTS rather than the last iteration. The last checkpoint is
+   frequently not the best one.
+2. **Face gate** — **blocking**, zero tolerance. Faces are where invented
+   detail is most visible and least forgivable.
+3. **Invention probe** — measures how much high-frequency detail the student
+   *invented* rather than recovered, and kills any arm that invents more than
+   the teacher it distils from. A model that wins on perceptual metrics by
+   hallucinating has not won.
+
+A fourth leg, temporal flicker on adjacent frames, is part of the project's
+verdict process but **its implementation is not in this repository yet**.
+
+See `docs/BENCHMARKS.md`, which also covers why standard bicubic-degraded
 benchmark sets are out-of-distribution for a codec-trained model.
 
 ## Layout
@@ -77,7 +98,7 @@ benchmark sets are out-of-distribution for a codec-trained model.
     src/userdevice_rtus/     architectures (student, backbone, teacher-side)
     configs/                  traiNNer-redux configs, per stage and tier
     scripts/                  data generation, teacher targets, ONNX export
-    eval/                     the four-leg verdict harness
+    eval/                     the verdict harness (sweep, face gate, probe)
     data/                     the data CONTRACT — never the data itself
     docs/                     provenance, benchmarks, naming
 

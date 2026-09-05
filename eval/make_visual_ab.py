@@ -10,7 +10,7 @@ crop lands on texture rather than a flat wall). Columns are labelled and
 always in the same order, and the ORIGINAL is first so the eye calibrates
 on ground truth before judging the rest.
 
-Usage (inside greyduck-train:dev, cwd /workspace):
+Usage (inside the container image, cwd /workspace):
   python make_visual_ab.py --ckpt ours=<path>:rtmosr_ea_film [--n 8]
       [--out /workspace/visual_ab]
 """

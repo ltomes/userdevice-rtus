@@ -3,7 +3,7 @@
 #  - raised teacher weight: targets are 0.55*GT + 0.45*colorfix(teacher)
 #    (gen_blend_targets.py <ds> 0.55 -> *_blend45; stage B used 0.7/0.3)
 #  - DISTS at 0.3 + light GAN (dunet, weight 0.02) for texture
-#  - LDL kept at 0.5 to police GAN artifacts (Shield-class artifact bar)
+#  - LDL kept at 0.5 to police GAN artifacts (strict artifact bar)
 # Every ckpt from this run MUST pass facegate/face_gate.py (exit 0) before
 # promotion — zero tolerance for generated faces.
 # Val runs against REAL GT so metrics measure fidelity, not blend fit.

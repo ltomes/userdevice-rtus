@@ -8,7 +8,7 @@
 #
 # The whole loop runs INSIDE one ffmpeg container (host has no ffmpeg;
 # per-image containers would cost hours of startup overhead). Memory-capped
-# and single-threaded encodes — ms serves the household.
+# and single-threaded encodes so it can share a machine with other work.
 #
 # Usage: bash gen_pairs_h264.sh <hr_dir> <out_root> [limit]
 set -euo pipefail

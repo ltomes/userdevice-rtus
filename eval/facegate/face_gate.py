@@ -7,7 +7,7 @@ IoU-overlapping detection in GT (score >= GT_THRESH, deliberately lower so
 borderline REAL faces don't count as hallucinations) is a violation.
 Gate: zero violations. Violating crops are saved for human review.
 
-Usage (inside greyduck-train:dev, needs onnxruntime):
+Usage (inside the container image, needs onnxruntime):
   python facegate/face_gate.py <ckpt.safetensors> <arch> [n_images]
   arch: rtmosr_l | rtmosr_ea_film | rtmosr_ea_film_sd
 """

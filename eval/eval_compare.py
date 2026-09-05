@@ -15,7 +15,7 @@ Metrics come from traiNNer's own registry implementations, so they are
 directly comparable to the numbers printed during training. crop_border=2
 and test_y_channel=True match the stage-C val config.
 
-Usage (inside greyduck-train:dev, cwd /workspace):
+Usage (inside the container image, cwd /workspace):
   python eval_compare.py [--n 300] [--out results/<name>.json] \
       [--ckpt LABEL=path.safetensors:arch] ...
 """

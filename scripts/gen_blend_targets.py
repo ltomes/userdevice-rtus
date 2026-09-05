@@ -1,6 +1,6 @@
 """Blended stage-B targets: 0.7*GT + 0.3*colorfix(teacher).
 
-Rationale (log.md 2026-08-16): pure teacher targets FAILED the sanity gate
+Rationale (measured 2026-08-16): pure teacher targets FAILED the sanity gate
 (-0.48 dB vs bicubic against GT; GAN fidelity trade + ~-3.4/255 global tone
 bias). GT-dominant blend keeps fidelity, injects teacher texture; per-image
 mean-matching (colorfix) removes the tone bias so B doesn't fight A on color.

@@ -15,7 +15,7 @@ Per source photo (512px HR):
 Filenames are prefixed v2_<src>_t<idx> so v1 and v2 can be mixed in one
 traiNNer dataroot list without collisions. Every 20th source -> val.
 
-Runs inside greyduck-train:dev (has ffmpeg now). Sequential clips, bounded
+Runs in the container image (has ffmpeg now). Sequential clips, bounded
 tmp; the container is memory/cpu-capped by the caller.
 """
 import glob
