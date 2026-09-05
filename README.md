@@ -4,7 +4,8 @@
 hard per-frame deadline: **38 ms** inside the 41.7 ms of a 24 fps frame, on
 **NVIDIA Jetson Thor** with TensorRT FP16. It is trained with
 [traiNNer-redux](https://github.com/the-database/traiNNer-redux) and
-distilled from `4xNomosWebPhoto_RealPLKSR`.
+distilled from
+[`4xNomosWebPhoto_RealPLKSR`](https://huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR).
 
 ## Why the deadline comes first
 
@@ -14,7 +15,8 @@ distilling, or handing the finished weights to TensorRT. Here the budget
 shaped what was trained:
 
 - **The architecture** was chosen by ablating the teacher to find which of its
-  mechanisms survive at speed (`userdevice_rtus.tools.ablate_teacher`).
+  mechanisms survive at speed
+  ([`ablate_teacher`](src/userdevice_rtus/tools/ablate_teacher.py)).
 - **Two tiers** exist because 1080p and 540p inputs leave different amounts of
   time in the same budget.
 - **The loss recipe** was selected under the latency ceiling, and every
@@ -25,11 +27,13 @@ shaped what was trained:
 
 | Tier | Arch name | Params | Target input | Why |
 |---|---|---|---|---|
-| d48 | `rtmosr_ea_film` | 9.72M | 1080p | the only tier that fits 1080p→4K inside the budget |
-| d64 | `rtmosr_ea_film_sd` | 33.9M | ≤720p | too slow for 1080p, so it spends the headroom that lower resolutions leave over |
+| d48 | [`rtmosr_ea_film`](src/userdevice_rtus/rtmosr_ea_vendored.py) | 9.72M | 1080p | the only tier that fits 1080p→4K inside the budget |
+| d64 | [`rtmosr_ea_film_sd`](src/userdevice_rtus/rtmosr_ea_vendored.py) | 33.9M | ≤720p | too slow for 1080p, so it spends the headroom that lower resolutions leave over |
 
-Both parameter counts are asserted at image build time, so they cannot drift
-from the code. Configs for the d64 tier carry `_sd` in the filename.
+Both names are registered in
+[`__init__.py`](src/userdevice_rtus/__init__.py), and both parameter counts
+are asserted at image build time, so they cannot drift from the code.
+[Configs](configs/) for the d64 tier carry `_sd` in the filename.
 
 ## Measured throughput (stage-D2 checkpoint)
 
@@ -59,8 +63,11 @@ The d64 tier exists because at 540p the d48 model uses about 6.3 ms of a
 
 ## How it is built
 
-A distilled student. The teacher is `4xNomosWebPhoto_RealPLKSR` (Philip
-Hofmann, CC-BY-4.0). The student is an RTMoSR-style small-kernel backbone with
+A distilled student. The teacher is
+[`4xNomosWebPhoto_RealPLKSR`](https://huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR)
+(Philip Hofmann, CC-BY-4.0), pinned by revision and digest in
+[`scripts/fetch_assets.sh`](scripts/fetch_assets.sh). The student is an
+[RTMoSR](https://github.com/rewaifu/RTMoSR)-style small-kernel backbone with
 a per-pixel EA gate on the residual branch of every backbone block. The
 teacher ablation showed its quality lives in EA gating and collective depth,
 not in its 17px large kernels, so the student keeps the cheap backbone and
@@ -68,7 +75,7 @@ buys depth over width.
 
 The release line trains **from scratch**: stage A initialises from nothing and
 every later stage initialises from the project's own stage-A checkpoint. No
-third-party weights are in the lineage (see `docs/PROVENANCE.md`).
+third-party weights are in the lineage (see [`docs/PROVENANCE.md`](docs/PROVENANCE.md)).
 
 ## Training data
 
@@ -84,28 +91,29 @@ The corpus is regenerated locally from public sources and is never committed.
 
 The `_film` in the config names denotes the **latency tier** (the 38 ms
 budget), not the content: the model was not trained on film, television, or
-any private media. Full contract and recipe rationale in `data/README.md`.
+any private media. Full contract and recipe rationale in [`data/README.md`](data/README.md).
 
 ## Quality is gated, not scored
 
 A checkpoint is accepted by passing four legs on identical frames, not
-because a number went up. The harness lives in `userdevice_rtus.tools`:
+because a number went up. The harness lives in
+[`userdevice_rtus.tools`](src/userdevice_rtus/tools/):
 
-1. **Sweep** (`eval_compare`) — PSNR/SSIM/DISTS/LPIPS across every
+1. **Sweep** ([`eval_compare`](src/userdevice_rtus/tools/eval_compare.py)) — PSNR/SSIM/DISTS/LPIPS across every
    checkpoint, against bicubic and the teacher, picking **best-by-DISTS**
    rather than the last iteration. The last checkpoint is frequently not the
    best one.
-2. **Face gate** (`facegate.face_gate`) — **blocking**, zero tolerance. Faces
+2. **Face gate** ([`facegate.face_gate`](src/userdevice_rtus/tools/facegate/face_gate.py)) — **blocking**, zero tolerance. Faces
    are where invented detail is most visible and least forgivable.
-3. **Invention probe** (`hallucination_probe`) — how much high-frequency
+3. **Invention probe** ([`hallucination_probe`](src/userdevice_rtus/tools/hallucination_probe.py)) — how much high-frequency
    detail the student *invented* rather than recovered. Any arm that invents
    more than the teacher is killed.
-4. **Temporal** (`temporal_eval`) — flicker on adjacent frames of the same
+4. **Temporal** ([`temporal_eval`](src/userdevice_rtus/tools/temporal_eval.py)) — flicker on adjacent frames of the same
    clip. Real motion cancels between output and ground-truth differences;
    what remains is temporal change the model invented. A per-frame model can
    shimmer on video while scoring well on every still-frame metric.
 
-`docs/BENCHMARKS.md` describes the legs in detail, what a public release still
+[`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) describes the legs in detail, what a public release still
 needs for comparability, and why bicubic-degraded benchmark sets are
 out-of-distribution for a codec-trained model.
 
@@ -142,16 +150,17 @@ docker run --rm -v "$PWD:/workspace" rtus-train:dev \
 
 Notes:
 
-- `ContainerFile` builds an x86_64 image; `ContainerFile.tegra` builds the
-  arm64 Jetson image and **must be built on arm64 hardware**.
-- `scripts/run-train.sh` reads `RTUS_DATA_ROOT`, `RTUS_IMAGE` and
+- [`ContainerFile`](ContainerFile) builds an x86_64 image;
+  [`ContainerFile.tegra`](ContainerFile.tegra) builds the arm64 Jetson image
+  and **must be built on arm64 hardware**.
+- [`scripts/run-train.sh`](scripts/run-train.sh) reads `RTUS_DATA_ROOT`, `RTUS_IMAGE` and
   `RTUS_MEMORY` from the environment and applies a hard memory cap by
   default — dataloader workers dominate host RAM.
 - **Without containers:** `uv pip install -e '.[train,teacher,export]'`, set
   `RTUS_DATA_ROOT` to wherever your data lives, and run `rtus-info` to see
   what is missing. The base install (no extras) is enough to build a model,
   load weights and score it; `train` pulls traiNNer-redux from git.
-- **Kubernetes:** see `k8s/README.md`. The image is self-contained, so a Job
+- **Kubernetes:** see [`k8s/README.md`](k8s/README.md). The image is self-contained, so a Job
   supplies data and a config name and nothing else.
 
 ## Repository layout
@@ -171,17 +180,22 @@ repository, and a release cites the commit it was trained from.
 
 ## Provenance, licence and attribution
 
-Code in this repository is **MIT** (see `LICENSE`). Third-party notices for
-RTMoSR (MIT), neosr and traiNNer-redux (Apache-2.0) are in `LICENSE`.
+Code in this repository is **MIT** (see [`LICENSE`](LICENSE)). Third-party
+notices are in the same file, for
+[RTMoSR](https://github.com/rewaifu/RTMoSR) (MIT),
+[neosr](https://github.com/neosr-project/neosr) and
+[traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+(both Apache-2.0).
 
-The released models are **distilled from `4xNomosWebPhoto_RealPLKSR` by
-Philip Hofmann**, licensed CC BY 4.0. That attribution is required by the
+The released models are **distilled from
+[`4xNomosWebPhoto_RealPLKSR`](https://huggingface.co/Phips/4xNomosWebPhoto_RealPLKSR)
+by Philip Hofmann**, licensed CC BY 4.0. That attribution is required by the
 teacher's licence and carries to the weights, not just to this source tree.
 
-`docs/PROVENANCE.md` is the full record — every component, its origin,
+[`docs/PROVENANCE.md`](docs/PROVENANCE.md) is the full record — every component, its origin,
 licence and evidence, the corpus lineage (the NomosRealWeb HRs are Nomos-v2,
 itself distilled from 14 upstream datasets), the from-scratch weight lineage,
 one recorded upstream discrepancy, and the obligations a release carries.
 Read it before releasing anything.
 
-Naming (`userdevice-rtus-<version>-<shape>`) is explained in `docs/NAMING.md`.
+Naming (`userdevice-rtus-<version>-<shape>`) is explained in [`docs/NAMING.md`](docs/NAMING.md).
