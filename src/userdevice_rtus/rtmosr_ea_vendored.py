@@ -12,7 +12,7 @@ import torch
 from torch import Tensor, nn
 from torch.nn.init import trunc_normal_
 
-from rtmosr_vendored import RTMoSR, GatedCNNBlock
+from userdevice_rtus.rtmosr_vendored import RTMoSR, GatedCNNBlock
 
 
 class EA(nn.Module):

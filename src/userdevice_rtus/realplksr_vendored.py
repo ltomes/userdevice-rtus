@@ -9,10 +9,7 @@ DySample = None  # stubbed: pixelshuffle only
 from torch import Tensor, nn
 from torch.nn.init import trunc_normal_
 
-class _R:
-    def register(self):
-        return lambda f: f
-ARCH_REGISTRY = _R()
+from userdevice_rtus._registry import ARCH_REGISTRY
 
 
 class LayerNorm(nn.Module):

@@ -1,0 +1,76 @@
+[project]
+name = "userdevice-rtus"
+version = "0.1.0.dev0"
+description = "userDevice RTUS — real-time 2x video upscaling for constrained GPUs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "userDevice" }]
+keywords = ["super-resolution", "real-time", "tensorrt", "video", "upscaling"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Video",
+]
+
+# Runtime floor: what it takes to BUILD a model, load weights, and score it.
+# Deliberately excludes traiNNer (training-only, installed from git) so that
+# evaluation and export work in a small environment.
+dependencies = [
+    "torch>=2.4",
+    "numpy>=1.26",
+    "pillow>=10.0",
+    "safetensors>=0.4",
+]
+
+[project.optional-dependencies]
+# Training. traiNNer-redux is not on PyPI and is pinned by revision: the
+# architecture registry contract and the metric implementations both come from
+# it, so an unpinned upstream can silently change reported numbers.
+train = [
+    "traiNNer @ git+https://github.com/the-database/traiNNer-redux@master",
+]
+# Teacher-target generation and the teacher ablation load the teacher through
+# spandrel rather than through this repo's own architecture code.
+teacher = ["spandrel>=0.4"]
+# ONNX export and the face gate's SCRFD detector.
+export = ["onnx>=1.17", "onnxscript>=0.1", "onnxruntime>=1.20"]
+# Everything, for the container image.
+all = [
+    "userdevice-rtus[train,teacher,export]",
+]
+
+[project.scripts]
+rtus-train = "userdevice_rtus.cli.train:main"
+rtus-eval = "userdevice_rtus.cli.evaluate:main"
+rtus-export = "userdevice_rtus.cli.export:main"
+rtus-facegate = "userdevice_rtus.cli.facegate:main"
+rtus-probe = "userdevice_rtus.cli.probe:main"
+rtus-gen-pairs = "userdevice_rtus.cli.gen_pairs:main"
+rtus-teacher-targets = "userdevice_rtus.cli.teacher_targets:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/userdevice_rtus"]
+
+# Configs ship INSIDE the package, and therefore inside the image. This is
+# deliberate: the alternative -- copying a config onto a node by hand -- is how
+# one training config in this project's history became unrecoverable and had to
+# be reconstructed from logs.
+[tool.hatch.build.targets.wheel.force-include]
+"configs" = "userdevice_rtus/configs"
+
+[tool.uv]
+# torch wheels are large and platform-specific; let the image's base CUDA
+# build satisfy it rather than resolving a second copy.
+override-dependencies = []
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
