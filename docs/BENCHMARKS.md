@@ -14,8 +14,8 @@ these legs on identical frames:
 2. **Face gate** — `facegate/face_gate.py`, BLOCKING. Zero tolerance for
    face-region violations.
 3. **Temporal** — flicker on adjacent frames, against a bicubic control.
-   NOTE: this leg is part of the project's verdict process but its
-   implementation is NOT in this repository.
+   The val set holds adjacent frames of the same clip; real motion cancels
+   between the two difference terms, leaving only invented temporal change.
 4. **Invention probe** — `hallucination_probe.py`: what fraction of
    high-frequency detail the student invents rather than recovers. The kill
    condition is inventing more than the teacher (8.50%).

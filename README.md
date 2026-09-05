@@ -109,7 +109,7 @@ it does.
 degradation. The `_film` in the config names denotes a latency tier — the
 38 ms budget inside the 41.7 ms of a 24fps frame — not content. See `data/README.md`.
 
-## Quality is gated, not scored
+## Quality is gated, not scored — four legs
 
 `userdevice_rtus.tools` holds the verdict harness. A checkpoint is not accepted because a
 number went up:
@@ -123,9 +123,12 @@ number went up:
    *invented* rather than recovered, and kills any arm that invents more than
    the teacher it distils from. A model that wins on perceptual metrics by
    hallucinating has not won.
-
-A fourth leg, temporal flicker on adjacent frames, is part of the project's
-verdict process but **its implementation is not in this repository yet**.
+4. **Temporal** — flicker on adjacent frames. The val set holds adjacent
+   frames of the same clip, and the metric compares how the model's output
+   changes between frames against how the ground truth changes, so real
+   motion cancels and what remains is temporal change the model invented.
+   A per-frame model applied to video can shimmer while scoring well on
+   every still-frame metric, which is why this leg exists.
 
 See `docs/BENCHMARKS.md`, which also covers why standard bicubic-degraded
 benchmark sets are out-of-distribution for a codec-trained model.
