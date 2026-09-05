@@ -175,7 +175,7 @@ Notes:
     scripts/                  host-side helpers (build corpus, fetch assets, launch training)
     k8s/                      kustomize base + example overlay
     data/                     the data CONTRACT — never the data itself
-    docs/                     provenance, benchmarks, naming
+    docs/                     provenance, benchmarks, naming, model card
 
 Training data, checkpoints, ONNX exports and TensorRT engines are all
 gitignored: this repository holds the code that produces weights, never the
@@ -213,3 +213,8 @@ one recorded upstream discrepancy, and the obligations a release carries.
 Read it before releasing anything.
 
 Naming (`userdevice-rtus-<version>-<shape>`) is explained in [`docs/NAMING.md`](docs/NAMING.md).
+
+[`docs/MODEL-CARD.md`](docs/MODEL-CARD.md) is the card that ships with a
+weights release — it is uploaded as the model repository's `README.md`, and
+it carries the attributions above. Keep it versioned with the code that
+produced the weights rather than editing it only on Hugging Face.
