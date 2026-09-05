@@ -175,8 +175,10 @@ Notes:
     docs/                     provenance, benchmarks, naming
 
 Training data, checkpoints, ONNX exports and TensorRT engines are all
-gitignored. Weights are published separately as a Hugging Face model
-repository, and a release cites the commit it was trained from.
+gitignored: this repository holds the code that produces weights, never the
+weights themselves. Released weights are to be published separately as a
+Hugging Face model repository, each release citing the commit it was trained
+from. No release has been published yet.
 
 ## Provenance, licence and attribution
 
