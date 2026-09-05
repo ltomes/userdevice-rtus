@@ -35,14 +35,17 @@ Both names are registered in
 are asserted at image build time, so they cannot drift from the code.
 [Configs](configs/) for the d64 tier carry `_sd` in the filename.
 
-## Measured throughput (stage-D2 checkpoint)
+## Measured throughput
 
-> **Read this first.** These figures were measured on the **stage-D2**
-> checkpoint of the d48 tier. The architecture is unchanged in later
-> checkpoints, so the latency is expected to carry over, but the current
-> release candidate has **not been re-timed**, and this repository contains no
-> timing harness. Do not quote an fps number for a checkpoint that has not
-> been measured.
+These figures were measured on the **stage-D2** checkpoint of the d48 tier,
+which is the first release. They describe the released weights, not a
+projection from a different checkpoint.
+
+> Two honest limits. This repository contains **no timing harness**, so the
+> numbers cannot be reproduced from this tree — they were taken on the target
+> hardware with the tooling named below. And they are the **d48 tier only**;
+> the d64 tier has no published timings. A later checkpoint must be re-timed
+> before its fps is quoted, whatever the architecture suggests.
 
 Jetson Thor, TensorRT 10.13.3, FP16, `builderOptimizationLevel=5`, CUDA graph
 enabled, median `enqueueV3` GPU time, compute-only:
