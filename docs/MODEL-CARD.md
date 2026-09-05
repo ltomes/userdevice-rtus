@@ -43,8 +43,12 @@ training arm, not a gain.
   selected best-by-DISTS across all eleven D2 checkpoints (0.141940).
 - **Tier** — d48, architecture `rtmosr_ea_film`, 9,722,409 parameters.
 - **Scale** — 2x.
-- **Source code** — https://github.com/ltomes/userdevice-rtus, commit
-  `78aa727`.
+- **Source code** — https://github.com/ltomes/userdevice-rtus at tag
+  [`v0.1.0`](https://github.com/ltomes/userdevice-rtus/releases/tag/v0.1.0).
+  A tag rather than a commit hash on purpose: the hash of the commit that
+  CONTAINS this card cannot be written into the card, and quoting an earlier
+  one dates the moment it is edited. The tag resolves to the exact tree these
+  weights were produced from.
 
 A second tier exists in the code (d64, `rtmosr_ea_film_sd`, 33,886,420
 parameters, for inputs at or below 720p). **It is not part of this release

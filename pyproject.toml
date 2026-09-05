@@ -1,6 +1,6 @@
 [project]
 name = "userdevice-rtus"
-version = "0.1.1.dev0"
+version = "0.1.0"
 description = "userDevice RTUS — 2x video upscaling under a hard real-time frame budget"
 readme = "README.md"
 requires-python = ">=3.11"

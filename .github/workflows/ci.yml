@@ -48,6 +48,9 @@ jobs:
         # and traiNNer onto the runner.
         run: python -m compileall -q src/
 
+      - name: pyyaml for the config check
+        run: pip install pyyaml
+
       - name: Every config is valid YAML
         # A malformed config currently fails only after a training Job has
         # been scheduled into a serialised GPU lane.
