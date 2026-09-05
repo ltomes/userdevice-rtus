@@ -1,0 +1,12 @@
+# Copy to datasets.local.yml (gitignored) and set for your host.
+# Configs reference the container paths; this file says what to mount there.
+mounts:
+  # public NomosRealWeb HR release, unpacked
+  nomosrealweb_hr: /path/to/nomosrealweb/hr      -> /workspace/datasets/nomosrealweb/hr
+  # generated pair corpora
+  greyduck2x:      /path/to/greyduck2x           -> /workspace/datasets/greyduck2x
+  greyduck2x_v2:   /path/to/greyduck2x_v2        -> /workspace/datasets/greyduck2x_v2
+  # teacher targets (generated)
+  teacher:         /path/to/greyduck2x_teacher   -> /workspace/datasets/greyduck2x_teacher
+  # fetched open benchmark sets
+  testsets:        /path/to/testsets             -> /workspace/testsets

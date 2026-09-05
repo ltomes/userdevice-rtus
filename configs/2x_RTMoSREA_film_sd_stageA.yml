@@ -1,0 +1,103 @@
+# userDevice film-tier student (<=540p inputs): RTMoSR+EA d64-b6, stage A.
+# Same from-scratch fidelity pretrain recipe as 2x_RTMoSREA_film_stageA;
+# only the geometry differs (dim=64, n_blocks=6 -> 33.9M params, 18.5 ms
+# @720p on Thor: fits the 38 ms film budget only at <=540p-class inputs,
+# per size-probe results 2026-08-20). Honors the user's directive to spend
+# quality where the low-res performance band allows it.
+# Launch AFTER 2x_RTMoSREA_film_stageA finishes (shared GPU, run serially).
+name: 2x_RTMoSREA_film_sd_stageA
+scale: 2
+use_amp: true
+amp_bf16: true
+use_channels_last: false
+fast_matmul: false
+use_compile: false
+num_gpu: auto
+manual_seed: 1024
+
+datasets:
+  train:
+    name: greyduck-v1v2-train
+    type: pairedimagedataset
+    dataroot_gt: [
+      /workspace/datasets/greyduck2x_v2/train/hr,
+      /workspace/datasets/greyduck2x/train/hr
+    ]
+    dataroot_lq: [
+      /workspace/datasets/greyduck2x_v2/train/lr,
+      /workspace/datasets/greyduck2x/train/lr
+    ]
+    lq_size: 64
+    use_hflip: true
+    use_rot: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 8
+    accum_iter: 1
+  val:
+    name: greyduck-val-realGT
+    type: pairedimagedataset
+    dataroot_gt: [
+      /workspace/datasets/greyduck2x_v2/val/hr,
+      /workspace/datasets/greyduck2x/val/hr
+    ]
+    dataroot_lq: [
+      /workspace/datasets/greyduck2x_v2/val/lr,
+      /workspace/datasets/greyduck2x/val/lr
+    ]
+
+network_g:
+  type: rtmosr_ea_film_sd
+
+path:
+  pretrain_network_g: ~
+  param_key_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+train:
+  ema_decay: 0.999
+  ema_power: 0.75
+  grad_clip: true
+  grad_clip_max_norm: 100
+  optim_g:
+    type: AdamW
+    lr: !!float 2e-4          # from-scratch LR
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  scheduler:
+    type: MultiStepLR
+    milestones: [75000, 120000, 140000]
+    gamma: 0.5
+  total_iter: 150000
+  warmup_iter: 1000
+  losses:
+    - type: charbonnierloss
+      loss_weight: 1.0
+
+val:
+  val_enabled: true
+  val_freq: 5000
+  save_img: false
+  tile_size: 0
+  tile_overlap: 8
+  metrics_enabled: true
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 2
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 2
+      test_y_channel: true
+    dists:
+      type: calculate_dists
+    lpips:
+      type: calculate_lpips
+      net: alex
+
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 5000
+  save_checkpoint_format: safetensors
+  use_tb_logger: true

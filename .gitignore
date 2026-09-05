@@ -1,0 +1,30 @@
+# Training data — NEVER committed. Regenerate with scripts/fetch_data.sh
+# and scripts/gen_pairs_*.  See docs/DATA.md.
+datasets/
+data/**
+!data/README.md
+!data/*.example.yml
+
+# Benchmark/test sets — fetched, not stored. scripts/fetch_testsets.sh
+testsets/
+
+# Training outputs: checkpoints, states, logs, visual A/B dumps
+experiments/
+onnx_out/
+pretrained/
+results/
+preview/
+visual_ab*/
+*.safetensors
+*.pth
+*.onnx
+*.plan
+*.npz
+*.ckpt
+
+# Local machine config (paths, mounts, device ids)
+*.local.yml
+.env
+
+__pycache__/
+*.pyc

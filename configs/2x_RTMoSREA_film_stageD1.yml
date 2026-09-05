@@ -1,0 +1,129 @@
+# userDevice film-tier d48-b3, stage D1: TEXTURE PUSH VIA TARGETS
+# Races D2 (texture push via losses). Beam discipline: two mechanisms for
+# the same goal, measured against each other rather than one hill-climbed.
+#  - targets move to 0.45*GT + 0.55*colorfix(teacher) (_blend55), up from
+#    stage-C 0.55/0.45 — more of the web model's texture in the target.
+#  - losses UNCHANGED from stage-C so the target change is the only variable.
+# Ship bar (STANDING-INSTRUCTIONS 2026-08-22): DISTS and LPIPS must land
+# COMFORTABLY NEGATIVE vs the teacher. Face gate is blocking, and
+# hallucination_probe.py invention rate must not exceed the teacher's.
+name: 2x_RTMoSREA_film_stageD1
+scale: 2
+use_amp: true
+amp_bf16: true
+use_channels_last: false
+fast_matmul: false
+use_compile: false
+num_gpu: auto
+manual_seed: 1024
+
+datasets:
+  train:
+    name: greyduck-blend55-train
+    type: pairedimagedataset
+    dataroot_gt: [
+      /workspace/datasets/greyduck2x_v2_blend55/train/hr,
+      /workspace/datasets/greyduck2x_blend55/train/hr
+    ]
+    dataroot_lq: [
+      /workspace/datasets/greyduck2x_v2/train/lr,
+      /workspace/datasets/greyduck2x/train/lr
+    ]
+    lq_size: 64
+    use_hflip: true
+    use_rot: true
+    num_worker_per_gpu: 16
+    batch_size_per_gpu: 8
+    accum_iter: 1
+  val:
+    name: greyduck-val-realGT
+    type: pairedimagedataset
+    dataroot_gt: [
+      /workspace/datasets/greyduck2x_v2/val/hr,
+      /workspace/datasets/greyduck2x/val/hr
+    ]
+    dataroot_lq: [
+      /workspace/datasets/greyduck2x_v2/val/lr,
+      /workspace/datasets/greyduck2x/val/lr
+    ]
+
+network_g:
+  type: rtmosr_ea_film
+
+network_d:
+  type: dunet
+
+path:
+  pretrain_network_g: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageA/models/net_g_ema_150000.safetensors
+  param_key_g: ~
+  strict_load_g: true
+  resume_state: /workspace/traiNNer-redux/experiments/2x_RTMoSREA_film_stageD1/training_states/10000.state
+
+train:
+  ema_decay: 0.999
+  ema_power: 0.75
+  grad_clip: true
+  grad_clip_max_norm: 100
+  optim_g:
+    type: AdamW
+    lr: !!float 2.5e-5
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  optim_d:
+    type: AdamW
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  scheduler:
+    type: MultiStepLR
+    milestones: [35000]
+    gamma: 0.5
+  total_iter: 50000
+  warmup_iter: 500
+  losses:
+    - type: msssiml1loss
+      loss_weight: 1.0
+    - type: perceptualloss
+      criterion: charbonnier
+      loss_weight: 0.01
+    - type: distsloss
+      loss_weight: 0.3
+    - type: hsluvloss
+      criterion: charbonnier
+      loss_weight: 0.5
+    - type: ldlloss
+      criterion: l1
+      loss_weight: 0.5
+    - type: ffloss
+      loss_weight: 0.05
+    - type: ganloss
+      gan_type: vanilla
+      loss_weight: 0.02
+
+val:
+  val_enabled: true
+  val_freq: 5000
+  save_img: false
+  tile_size: 0
+  tile_overlap: 8
+  metrics_enabled: true
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 2
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 2
+      test_y_channel: true
+    dists:
+      type: calculate_dists
+    lpips:
+      type: calculate_lpips
+      net: alex
+
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 5000
+  save_checkpoint_format: safetensors
+  use_tb_logger: true
