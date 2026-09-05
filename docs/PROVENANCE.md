@@ -17,7 +17,7 @@ be *claimed* rather than what may be shipped.
 | `traiNNer-redux` (training framework, metrics) | github.com/the-database/traiNNer-redux | **Apache-2.0** | `LICENSE.txt` in the upstream repository |
 | `rtmosr_vendored.py` (backbone) | github.com/rewaifu/RTMoSR | **MIT** | upstream repository licence |
 | `realplksr_vendored.py` | Derived from `neosr` (`neosr/archs/realplksr_arch.py`), with umzi2's dysample/layernorm modifications; descended from spandrel's PLKSR/RealPLKSR | **Apache-2.0** | github.com/neosr-project/neosr |
-| `rtmosr_ea_vendored.py` (the student) | Ours. RTMoSR backbone plus an EA gate grafted from RealPLKSR, derived from our own teacher ablation | Ours, inheriting MIT and Apache-2.0 above | `eval/ablate_teacher.py` is the ablation it came from |
+| `rtmosr_ea_vendored.py` (the student) | Ours. RTMoSR backbone plus an EA gate grafted from RealPLKSR, derived from our own teacher ablation | Ours, inheriting MIT and Apache-2.0 above | `userdevice_rtus/tools/ablate_teacher.py` is the ablation it came from |
 | `scrfd_2.5g_bnkps.onnx` (face-gate detector) | InsightFace SCRFD | **UNVERIFIED** | Third-party weights, fetched rather than committed. Only matters if redistributed — we do not redistribute it. |
 
 ## Teacher
