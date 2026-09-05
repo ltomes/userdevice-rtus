@@ -1,3 +1,21 @@
+---
+license: cc-by-sa-4.0
+library_name: onnx
+pipeline_tag: image-to-image
+# No base_model tag: this is a DISTILLATION. HF base_model_relation
+# accepts finetune/adapter/merge/quantized and none of those is true --
+# the student trains from scratch against teacher targets. A wrong
+# relation would be a false provenance claim on a public page, so the
+# teacher is credited in the prose and in LICENSE/NOTICE instead.
+tags:
+  - super-resolution
+  - video-upscaling
+  - real-time
+  - onnx
+  - tensorrt
+  - jetson
+---
+
 # Model card — userDevice RTUS
 
 This is the card that ships with a weights release. It is kept in the code
@@ -5,8 +23,8 @@ repository so it is versioned alongside the model that produced it, and is
 uploaded as the `README.md` of the Hugging Face model repository under
 [huggingface.co/ltomes](https://huggingface.co/ltomes).
 
-**Fields marked `<TBD>` must be filled from the actual release artifacts
-before upload. Do not guess them.**
+Per-file digests are not reproduced here; they ship as `SHA256SUMS` beside
+the weights, generated at upload from the artefacts themselves.
 
 ---
 
@@ -21,11 +39,12 @@ frame time. This one treats the frame budget as the constraint and spends
 quality inside it. A quality gain that missed the budget was a rejected
 training arm, not a gain.
 
-- **Release** — `<TBD version>`, the **stage-D2** checkpoint.
+- **Release** — `0.1.0`, the **stage-D2** checkpoint, iteration 50000,
+  selected best-by-DISTS across all eleven D2 checkpoints (0.141940).
 - **Tier** — d48, architecture `rtmosr_ea_film`, 9,722,409 parameters.
 - **Scale** — 2x.
 - **Source code** — https://github.com/ltomes/userdevice-rtus, commit
-  `<TBD commit>`.
+  `78aa727`.
 
 A second tier exists in the code (d64, `rtmosr_ea_film_sd`, 33,886,420
 parameters, for inputs at or below 720p). **It is not part of this release
@@ -35,11 +54,13 @@ and has no published timings.**
 
 | File | What it is |
 |---|---|
-| `userdevice-rtus-<TBD version>-540p.onnx` | fixed-shape ONNX, 540p input |
-| `userdevice-rtus-<TBD version>-720p.onnx` | fixed-shape ONNX, 720p input |
-| `userdevice-rtus-<TBD version>-1080p.onnx` | fixed-shape ONNX, 1080p input |
-| `userdevice-rtus-<TBD version>-parity.npz` | a fixed real input and the torch fp32 output for it |
-| `<TBD checkpoint filename>` | the training checkpoint, for re-export and fine-tuning |
+| `userdevice-rtus-0.1.0-540p.onnx` | fixed-shape ONNX, 540p input |
+| `userdevice-rtus-0.1.0-720p.onnx` | fixed-shape ONNX, 720p input |
+| `userdevice-rtus-0.1.0-1080p.onnx` | fixed-shape ONNX, 1080p input |
+| `userdevice-rtus-0.1.0-parity.npz` | a fixed real input and the torch fp32 output for it |
+| `userdevice-rtus-0.1.0.safetensors` | the training checkpoint, for re-export and fine-tuning |
+| `userdevice-rtus-0.1.0-sweep.json` | the sweep this selection was made from |
+| `SHA256SUMS` | digests for every file above |
 
 The shapes are fixed rather than dynamic because the deployment target
 builds one engine per working point.
