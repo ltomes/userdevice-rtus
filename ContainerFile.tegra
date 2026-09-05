@@ -1,0 +1,68 @@
+# RTUS training / evaluation image for arm64 Jetson (Thor / sm_110).
+#
+# The plain ContainerFile builds an x86_64 image. The GPU node in this
+# project's cluster is arm64 with a Tegra kernel, so that image cannot run
+# there at all -- it fails as `exec /bin/sh: exec format error`, which is a
+# confusing way for an architecture mismatch to present.
+#
+# MUST BE BUILT ON arm64 HARDWARE. qemu cross-builds have been measured as
+# non-viable for this stack (meson and pkg-config failures, and builds that
+# take 30+ minutes flakily versus 15-25 natively).
+#
+#   podman build -f ContainerFile.tegra -t rtus-train:0.1.0-tegra .
+#
+# The base ships a Tegra-native torch built for sm_110. NEVER reinstall
+# torch, torchvision, torchaudio or numpy: PyPI torchvision linked against a
+# Tegra torch fails at runtime with "operator torchvision::nms does not
+# exist", and it fails late, inside a job, not at build time.
+
+FROM ghcr.io/nvidia-ai-iot/vllm:latest-jetson-thor
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git ffmpeg libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# The base pins pip to a partial Jetson mirror, so anything not mirrored
+# there needs the real index as well.
+ARG PIP_EXTRA=--extra-index-url=https://pypi.org/simple
+
+ARG TRAINNER_REF=master
+RUN git clone --depth 1 --branch "${TRAINNER_REF}" \
+      https://github.com/the-database/traiNNer-redux /opt/traiNNer-redux
+
+# Install traiNNer's dependencies WITHOUT letting it pull a PyPI torch stack
+# over the Tegra one. traiNNer declares numpy>=2 and would drag torch in
+# transitively; both must come from the base image.
+RUN cd /opt/traiNNer-redux \
+    && python -c "\
+import tomllib, pathlib; \
+d = tomllib.load(open('pyproject.toml','rb'))['project']['dependencies']; \
+keep = [x for x in d if not x.split('[')[0].split('>')[0].split('<')[0].split('=')[0].strip().lower() in ('torch','torchvision','torchaudio','numpy')]; \
+pathlib.Path('/tmp/r.txt').write_text('\n'.join(keep))" \
+    && pip install --no-cache-dir ${PIP_EXTRA} -r /tmp/r.txt \
+    && pip install --no-cache-dir --no-deps -e /opt/traiNNer-redux
+
+WORKDIR /app
+COPY pyproject.toml README.md LICENSE ./
+COPY src ./src
+COPY configs ./configs
+COPY scripts ./scripts
+
+# --no-deps for the package itself, then its runtime deps explicitly, minus
+# anything the base already provides.
+RUN pip install --no-cache-dir --no-deps . \
+    && pip install --no-cache-dir ${PIP_EXTRA} \
+         pillow safetensors huggingface-hub spandrel onnx onnxscript
+
+# Verify by RUNNING, not only at build time: a build-time gate can be served
+# from a layer cache and silently stop executing. This check is cheap enough
+# to keep here as well, but rtus-info in the Job is what actually proves it.
+RUN python -c "import userdevice_rtus as r; \
+assert r.USING_REAL_REGISTRY, 'traiNNer registry not resolved'; \
+m = r.build_tier('rtmosr_ea_film'); \
+n = sum(p.numel() for p in m.parameters()); \
+import torch; \
+print(f'rtus tegra ok: d48={n:,} params, torch={torch.__version__}')"
+
+ENV RTUS_DATA_ROOT=/workspace
+CMD ["rtus-info"]

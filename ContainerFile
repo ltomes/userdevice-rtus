@@ -2,6 +2,9 @@
 #
 #   podman build -t rtus-train:dev .          (or: docker build -f ContainerFile)
 #
+# THIS BUILDS AN x86_64 IMAGE. For an arm64 Jetson GPU node use
+# ContainerFile.tegra -- an x86 image fails there as "exec format error".
+#
 # Self-contained by design: the package, its configs and traiNNer are all baked
 # in, so a Kubernetes Job needs to mount data and nothing else. The alternative
 # -- bind-mounting source and copying configs onto nodes by hand -- is how one
