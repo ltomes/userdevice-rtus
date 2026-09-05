@@ -21,6 +21,9 @@ dependencies = [
     "numpy>=1.26",
     "pillow>=10.0",
     "safetensors>=0.4",
+    # fetch_assets.sh pulls the teacher and the face-gate detector by pinned
+    # revision and verifies their digests.
+    "huggingface-hub>=0.25",
 ]
 
 [project.optional-dependencies]

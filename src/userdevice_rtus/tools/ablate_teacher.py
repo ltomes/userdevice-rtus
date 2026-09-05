@@ -28,7 +28,7 @@ from spandrel import ModelLoader
 N_IMAGES = 24
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 
-TEACHER = f"{_RTUS_ROOT}/pretrained/teacher_4xNomosWebPhoto_RealPLKSR.pth"
+TEACHER = f"{_RTUS_ROOT}/pretrained/teacher_4xNomosWebPhoto_RealPLKSR.safetensors"
 VAL = f"{_RTUS_ROOT}/datasets/greyduck2x/val/lr"
 OUT = f"{_RTUS_ROOT}/teacher_ablation.json"
 

@@ -28,7 +28,7 @@ RESULTS = DATA_ROOT / "results"
 ONNX_OUT = DATA_ROOT / "onnx_out"
 
 #: The teacher, under the exact stem the tools expect.
-TEACHER = PRETRAINED / "teacher_4xNomosWebPhoto_RealPLKSR.pth"
+TEACHER = PRETRAINED / "teacher_4xNomosWebPhoto_RealPLKSR.safetensors"
 
 #: SCRFD detector used by the (blocking) face gate.
 SCRFD = PRETRAINED / "scrfd_2.5g_bnkps.onnx"
