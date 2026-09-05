@@ -1,0 +1,149 @@
+# CI for what an x86 CPU runner can actually prove.
+#
+# SCOPE, deliberately narrow. This does NOT run the four-leg quality gate --
+# sweep, face gate, invention probe, temporal. That needs a Jetson Thor GPU,
+# an 1800-frame validation corpus and the teacher's outputs, none of which
+# belong on a hosted runner. That gate runs on the cluster, and a release
+# ships its verdict alongside the weights.
+#
+# What CI is for here is the OTHER failure class: "the repo does not run as
+# cloned". Every check below corresponds to a defect this project has
+# actually hit -- a config that did not ship inside the wheel, an entry point
+# that did not install, an f-string typo a sed produced. Those cost a human
+# or a five-hour GPU Job to discover. They should cost ninety seconds.
+#
+# Deliberately NOT here: a self-hosted runner on the GPU node. It is the
+# obvious way to run the real gate and it is the wrong one -- it would be a
+# second control path into odinson that Flux cannot see, holding GitHub
+# credentials, able to contend for a GPU lane whose serialisation lives in
+# manifest registration.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Dependency-free, runs in seconds, catches what would otherwise surface
+  # only inside a container build.
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+
+      - name: Every source file parses
+        # Syntax only, not an import: tools/ legitimately need the optional
+        # extras. This catches the typo class without pulling onnx, spandrel
+        # and traiNNer onto the runner.
+        run: python -m compileall -q src/
+
+      - name: Every config is valid YAML
+        # A malformed config currently fails only after a training Job has
+        # been scheduled into a serialised GPU lane.
+        run: |
+          python - <<'PY'
+          import pathlib, sys, yaml
+          files = sorted(pathlib.Path("configs").glob("*.yml"))
+          assert files, "no configs found -- did the directory move?"
+          bad = 0
+          for p in files:
+              try:
+                  yaml.safe_load(p.read_text())
+                  print(f"ok   {p}")
+              except Exception as exc:
+                  print(f"FAIL {p}: {exc}")
+                  bad += 1
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Lint
+        run: pipx run ruff check .
+
+  # Proves the package installs and works from a clean environment, which is
+  # the first thing a user does.
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+
+      - name: Install torch (CPU wheels)
+        # The default index serves the CUDA build, ~2 GB, to a runner with no
+        # GPU. The CPU index keeps this job in the low minutes.
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch
+
+      - name: Install the package from a clean environment
+        run: pip install .
+
+      - name: Entry points installed and runnable
+        # Two console scripts by design. rtus-train needs the train extra, so
+        # only its presence is asserted here, not a run.
+        run: |
+          rtus-info
+          command -v rtus-train
+
+      - name: The architectures build at the declared sizes
+        # These counts are the contract the container build also asserts, and
+        # they appear in the model card. A silent architecture change would
+        # invalidate every published number.
+        run: |
+          python - <<'PY'
+          from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
+          base = dict(scale=2, ffn_expansion=2, unshuffle_mod=True,
+                      dccm=True, se=True)
+          expected = {
+              "rtmosr_ea_film":    (dict(dim=48, n_blocks=3),  9_722_409),
+              "rtmosr_ea_film_sd": (dict(dim=64, n_blocks=6), 33_886_420),
+          }
+          bad = 0
+          for name, (kw, want) in expected.items():
+              got = sum(p.numel() for p in RTMoSREA(**base, **kw).parameters())
+              if got != want:
+                  bad += 1
+              print(f"{'ok  ' if got == want else 'FAIL'} {name}: "
+                    f"{got:,} (expected {want:,})")
+          raise SystemExit(1 if bad else 0)
+          PY
+
+      - name: Configs ship INSIDE the wheel
+        # Shipping configs in the package is deliberate: copying one onto a
+        # node by hand is how a config in this project's history became
+        # unrecoverable and had to be reconstructed from logs.
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+          import userdevice_rtus
+          installed = pathlib.Path(userdevice_rtus.__file__).parent / "configs"
+          shipped = sorted(p.name for p in installed.glob("*.yml"))
+          source = sorted(p.name for p in pathlib.Path("configs").glob("*.yml"))
+          print("in wheel:", shipped)
+          if shipped != source:
+              print("MISMATCH against configs/ in the source tree:", source)
+              sys.exit(1)
+          print(f"{len(shipped)} configs present")
+          PY
+
+  # The Kubernetes overlay is part of the deliverable: a Job that cannot be
+  # rendered is a Job nobody can run.
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: kustomize build the example overlay
+        run: |
+          curl -sSLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
+          tar xzf kustomize.tar.gz
+          ./kustomize build k8s/overlays/example

@@ -126,10 +126,28 @@ Those terms bind the dataset; this release distributes a model and
 redistributes no images. Full record in
 [`docs/PROVENANCE.md`](https://github.com/ltomes/userdevice-rtus/blob/main/docs/PROVENANCE.md).
 
-## How it was evaluated
+## How it was evaluated — and what this release scored
 
 A checkpoint is accepted by passing four legs on identical frames, not
-because a number went up:
+because a number went up. **This release passed all four**, measured
+2026-09-05 on the project's validation split:
+
+| Leg | Result for 0.1.0 | Verdict |
+|---|---|---|
+| Sweep (DISTS) | iter050000 at 0.141940, best of eleven | selected |
+| Face gate | 0 violations in 60 images | **PASS** |
+| Temporal | 5.9147 vs bicubic 6.0240 (−1.8%) | **PASS** — steadier than bicubic |
+| Invention probe | 6.14% vs teacher 8.50% | **PASS** — invents less than the teacher |
+
+Read the invention rate against bicubic rather than as an absolute: bicubic
+cannot invent detail, so its 2.14% is the detector's false-positive floor.
+The kill condition is exceeding the teacher, and this release sits below it.
+
+The sweep that made the selection ships with the weights as
+`userdevice-rtus-0.1.0-sweep.json`, so the choice of iteration 50000 over
+the other ten is checkable rather than asserted.
+
+What the four legs are:
 
 1. **Sweep** — PSNR/SSIM/DISTS/LPIPS across every checkpoint against
    bicubic and the teacher, selecting **best-by-DISTS** rather than the last
