@@ -43,13 +43,46 @@ resolve unilaterally. A commercial release should confirm with the author.
 
 | Component | Origin | Licence | Evidence |
 |---|---|---|---|
-| HR training images | NomosRealWeb release — `hr.tar`, 6000 x 512² Nomos-v2 HRs | **UNKNOWN** | No dataset licence is stated on the release page or on OpenModelDB. **The one open item.** |
+| HR training images | NomosRealWeb release — `hr.tar`, 6000 x 512² Nomos-v2 HRs | **A STACK — see below** | Nomos-v2 states no licence of its own, and is distilled from 14 upstream datasets, at least one of which (FFHQ) is CC BY-NC-SA 4.0. **The open item.** |
 | LR training images | Generated locally from the HRs by our own scripts | Ours | `scripts/gen_pairs_h264.sh`, `scripts/gen_pairs_v2.py` |
 | Teacher targets | Output of the teacher over our LR | Follows the teacher | `scripts/gen_teacher_targets.py` |
 
-We redistribute no images, so the open dataset licence bounds what a model
-card may **claim** about the corpus, not what may be shipped. It should still
-be settled before the card asserts anything about the training data's terms.
+### The dataset licence is a stack, not a single unknown
+
+Nomos-v2 is not an originally-captured dataset. Its own description states it
+was distilled from **14 upstream datasets**: Adobe-MIT-5k, RAISE, LSDIR,
+LIU4k-v2, KONIQ-10k, Nikon LL RAW, DIV8k, **FFHQ**, Flickr2k,
+ModernAnimation1080_v2, Rawsamples, SignatureEdits, Hasselblad raw samples,
+and Unsplash.
+
+At least one of those carries terms that matter:
+
+| Upstream | Licence | Consequence |
+|---|---|---|
+| **FFHQ** (NVIDIA) | **CC BY-NC-SA 4.0** — verified 2026-09-05 | **Non-commercial**, and share-alike |
+
+Several others (DIV8K, Flickr2K, RAISE, Adobe-MIT-5k) are published for
+academic research; their individual terms have **not** been read here and
+should be before any commercial claim is made.
+
+**What this does and does not mean.** We redistribute no images, so nothing
+about this restricts what this repository ships. What is genuinely unsettled
+is whether dataset licence terms propagate to the *weights* trained on them.
+That is a contested legal question, jurisdiction-dependent, and it is not
+resolved by anything in this document — do not read the presence of this
+section as either permission or prohibition.
+
+It matters here for two specific decisions, and both need a human answer:
+
+1. **Commercial use of the released weights**, given a non-commercial
+   component in the corpus lineage.
+2. **The weights licence.** A share-alike component upstream sits more
+   comfortably with a share-alike release than a permissive one.
+
+The same lineage reaches us twice: our HR corpus is the NomosRealWeb release
+of Nomos-v2 HRs, and the teacher we distil from was itself trained on
+Nomos-v2. Retraining on a different corpus would not by itself clear the
+teacher path.
 
 **No private media is involved.** The corpus contains no film, television or
 personal library content: the HR source is a public photograph dataset
