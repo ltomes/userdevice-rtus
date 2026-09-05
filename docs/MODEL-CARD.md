@@ -54,6 +54,57 @@ A second tier exists in the code (d64, `rtmosr_ea_film_sd`, 33,886,420
 parameters, for inputs at or below 720p). **It is not part of this release
 and has no published timings.**
 
+## What it looks like
+
+Each panel is one frame, three ways: **bicubic** (what you get with no model
+at all), **RTUS 0.1.0**, and the **ground truth**. The bottom row is a 3×
+nearest-neighbour zoom on the busiest tile in the frame — at full-frame scale
+on a monitor, perceptual differences are invisible, which is how a lot of
+super-resolution comparisons get away with proving nothing.
+
+These come from the **same validation split every number on this page was
+measured on**, so the pictures and the table describe the same data. The
+fourth column is the teacher this model was distilled from — it produces
+excellent results and **cannot hit the frame budget**, which is the whole
+point of the student.
+
+![Validation sample 1](samples/val/valsample-01.png)
+
+![Validation sample 2](samples/val/valsample-02.png)
+
+![Validation sample 3](samples/val/valsample-03.png)
+
+### On real video
+
+The validation split is still frames. Video is not, and a per-frame model
+can shimmer on motion while scoring well on every still-frame metric —
+which is why the temporal leg exists. These panels are frames from
+**Sintel**, degraded the same way, as a check on real footage:
+
+![Sintel sample 1](samples/sample-frame_01.png)
+
+![Sintel sample 2](samples/sample-frame_03.png)
+
+All panels are in [`samples/`](samples).
+
+**Two things about how these were made, because they change what the images
+mean.**
+
+The input is degraded with the **same recipe as training** — downscale 1/2,
+then real libx264 at CRF 26, decoded back. Not a clean bicubic shrink. Every
+super-resolution model looks better on a clean downscale, and it is not the
+input this model was built for: the whole point is codec damage. Samples
+produced the flattering way would tell you nothing about video.
+
+The video frames are **Sintel**, © copyright Blender Foundation |
+[durian.blender.org](https://durian.blender.org), licensed
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+The validation panels are demonstration crops from this project's own
+validation split, as every super-resolution model card carries. No dataset
+is redistributed here and none is packaged with the model; corpus lineage
+is recorded in `PROVENANCE.md`.
+
 ## Files in this release
 
 | File | What it is |
