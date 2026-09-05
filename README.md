@@ -32,18 +32,19 @@ bash scripts/fetch_assets.sh ./pretrained
 
 # 4. Build the training corpus from the public HR set.
 docker run --rm -v "$PWD:/workspace" rtus-train:dev \
-    rtus-gen-pairs                        # v2 corpus: motion + real H.264
+    python -m userdevice_rtus.tools.gen_pairs_v2   # motion + real H.264
 
 # 5. Train a config, by name.
 bash scripts/run-train.sh configs/2x_RTMoSREA_film_stageE_dists90.yml
 
 # 6. Score every checkpoint and pick the best by DISTS (not the last one).
+#    Tools run as modules; only train and info are console commands.
 docker run --rm -v "$PWD:/workspace" rtus-train:dev \
-    rtus-eval --sweep experiments/<name>:rtmosr_ea_film
+    python -m userdevice_rtus.tools.eval_compare --sweep experiments/<name>:rtmosr_ea_film
 
 # 7. Export to ONNX.
 docker run --rm -v "$PWD:/workspace" rtus-train:dev \
-    rtus-export <ckpt.safetensors> <name> rtmosr_ea_film
+    python -m userdevice_rtus.tools.export_student <ckpt> <name> rtmosr_ea_film
 ```
 
 Running without containers: `uv pip install -e '.[train,teacher,export]'`,

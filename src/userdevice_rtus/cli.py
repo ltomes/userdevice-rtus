@@ -1,24 +1,26 @@
 """Console entry points.
 
-The tools in `userdevice_rtus.tools` are scripts: they do their work at
-import time and read `sys.argv` directly. That is deliberate -- they are
-research tools and rewriting them into libraries would risk changing
-measured behaviour for no benefit.
+Deliberately only two. Everything in `userdevice_rtus.tools` is already
+runnable as `python -m userdevice_rtus.tools.<name>`, so wrapping each one in
+a console script would add documentation and maintenance surface without
+adding a capability.
 
-So each entry point below runs its module the way `python -m` would, which
-preserves `__name__ == "__main__"` semantics and argv handling exactly, while
-still giving contributors and Kubernetes jobs a stable command to call
-instead of a path into the source tree.
+These two exist because they do something `python -m` cannot:
+
+`train` has real work to do. traiNNer is an application, not a library: its
+entry point is a train.py at its repository root, which expects to be run
+from that root with the root importable. Without this wrapper a Kubernetes
+Job would carry `bash -c "cd ... && python train.py ..."`, and inline shell
+in a Job spec is precisely what this layout removes.
+
+`info` reports what an environment can actually do, which is the difference
+between "the model is wrong" and "the environment is incomplete".
 """
 
 from __future__ import annotations
 
 import runpy
 import sys
-
-
-def _run(module: str) -> None:
-    sys.exit(runpy.run_module(module, run_name="__main__") and 0)
 
 
 def train() -> None:
@@ -56,34 +58,6 @@ def train() -> None:
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
     runpy.run_path(str(script), run_name="__main__")
-
-
-def evaluate() -> None:
-    _run("userdevice_rtus.tools.eval_compare")
-
-
-def export() -> None:
-    _run("userdevice_rtus.tools.export_student")
-
-
-def facegate() -> None:
-    _run("userdevice_rtus.tools.facegate.face_gate")
-
-
-def probe() -> None:
-    _run("userdevice_rtus.tools.hallucination_probe")
-
-
-def gen_pairs() -> None:
-    _run("userdevice_rtus.tools.gen_pairs_v2")
-
-
-def teacher_targets() -> None:
-    _run("userdevice_rtus.tools.gen_teacher_targets")
-
-
-def blend_targets() -> None:
-    _run("userdevice_rtus.tools.gen_blend_targets")
 
 
 def info() -> None:
