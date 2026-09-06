@@ -1,0 +1,65 @@
+{
+  "version": "0.1.0",
+  "measured_on": "2026-09-05",
+  "checkpoint": {
+    "stage": "D2",
+    "iteration": 50000,
+    "tier": "d48",
+    "architecture": "rtmosr_ea_film",
+    "parameters": 9722409,
+    "scale": 2
+  },
+  "selection": {
+    "metric": "DISTS",
+    "value": 0.14194,
+    "candidates": 11,
+    "basis": "best-by-DISTS across all eleven stage-D2 checkpoints"
+  },
+  "legs": [
+    {
+      "name": "Sweep (DISTS)",
+      "result": "iter050000 at 0.141940, best of eleven",
+      "verdict": "selected",
+      "blocking": false
+    },
+    {
+      "name": "Face gate",
+      "result": "0 violations in 60 images",
+      "verdict": "PASS",
+      "blocking": true
+    },
+    {
+      "name": "Temporal",
+      "result": "5.9147 vs bicubic 6.0240 (-1.8%)",
+      "verdict": "PASS",
+      "blocking": false
+    },
+    {
+      "name": "Invention probe",
+      "result": "6.14% vs teacher 8.50%, bicubic floor 2.14%",
+      "verdict": "PASS",
+      "blocking": false
+    }
+  ],
+  "throughput": {
+    "device": "NVIDIA Jetson Thor",
+    "runtime": "TensorRT 10.13.3, FP16, builderOptimizationLevel=5, CUDA graph enabled",
+    "method": "median enqueueV3 GPU time, compute-only",
+    "note": "p95 and p99 within 0.2 ms of the median at every shape",
+    "shapes": [
+      {"input": "540p", "output": "1080p", "latency_ms": 6.335, "fps": 158},
+      {"input": "720p", "output": "1440p", "latency_ms": 12.35, "fps": 81},
+      {"input": "1080p", "output": "4K", "latency_ms": 28.742, "fps": 35}
+    ]
+  },
+  "parity": {
+    "db": 75.51,
+    "against": "torch fp32 reference",
+    "threshold_db": 40
+  },
+  "weights": {
+    "host": "Hugging Face",
+    "repo": "ltomes/userdevice-rtus",
+    "revision": "v0.1.0"
+  }
+}

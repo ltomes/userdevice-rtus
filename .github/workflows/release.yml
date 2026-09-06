@@ -1,0 +1,77 @@
+# Publish a GitHub Release from the tag's own verdict file.
+#
+# WHY THIS IS AUTOMATED. The release note's numbers are measurements of one
+# checkpoint -- a different number would mean a different artifact -- so they
+# should be transcribed by a machine, not retyped by a human into a workflow.
+# Everything rendered here comes from releases/<tag>/verdict.json, which the
+# cluster's analyse Job produces.
+#
+# WHAT IT DELIBERATELY DOES NOT DO. It does not attach weights. They live on
+# Hugging Face with their SHA256SUMS and their evidence JSONs, and two homes
+# for a weights file is two things to verify with one of them drifting. It also
+# does not copy the model card: the card is edited over time, a release note is
+# not, and pasting one into the other guarantees a contradiction later.
+#
+# THE CHECKS ARE THE POINT. This fails the build if the verdict file is
+# missing, if its version disagrees with the tag, or if pyproject.toml
+# disagrees with either. The version is maintained in several places by hand,
+# so drift becomes a red X here rather than a wrong number on a public page.
+#
+# No third-party actions: the built-in GITHUB_TOKEN and the gh CLI already
+# present on the runner do the whole job, and this repository does not take on
+# supply-chain surface it does not need.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  # So an EXISTING tag can get its release without being re-tagged. Re-pointing
+  # a published tag would break the model card, which cites the tag as the
+  # provenance anchor for the weights.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build a release for (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve the tag
+        id: tag
+        run: echo "tag=${{ inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          # Check out the TAG, not the branch: the notes must describe the tree
+          # the weights were produced from.
+          ref: ${{ steps.tag.outputs.tag }}
+
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+
+      - name: Render the notes (fails on any version disagreement)
+        run: |
+          python scripts/render_release_notes.py "${{ steps.tag.outputs.tag }}" \
+            --out release-notes.md
+          echo "----- rendered -----"
+          cat release-notes.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          # Idempotent: re-running updates the notes rather than failing, so a
+          # fixed verdict file can be re-rendered without deleting a release.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file release-notes.md
+            echo "updated existing release $TAG"
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md
+            echo "created release $TAG"
+          fi
