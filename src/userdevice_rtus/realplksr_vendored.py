@@ -1,3 +1,17 @@
+# Derived from neosr's realplksr_arch.py — https://github.com/neosr-project/neosr
+# Copyright the neosr authors. Licensed under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#
+# This file has been MODIFIED from the original: DySample is stubbed out so
+# only pixelshuffle upsampling is reachable, and the module is not registered
+# with the training framework. The Apache-2.0 terms above govern this file;
+# the repository's MIT LICENSE does not.
+#
 # RETAINED AS REFERENCE, NOT INSTANTIATED. Nothing imports this module: the
 # teacher is loaded through spandrel. It is the RealPLKSR definition the EA
 # gate in rtmosr_ea_vendored.py was grafted from, kept so that graft can be
