@@ -1,12 +1,23 @@
 """RTMoSR + EA: the teacher-ablation-derived film-tier student (2026-08-20).
 
-Ablation of 4xNomosWebPhoto_RealPLKSR (results/teacher-ablation.json)
-showed its quality lives in (a) per-pixel EA gating — removal is the most
-catastrophic single ablation, 14.1 dB survival — and (b) collective depth,
-NOT in the 17px large kernels (1x1-cropped kernels survive at 29.6 dB).
-So: keep RTMoSR's fast small-kernel backbone, graft the teacher's EA gate
-(3x3 conv + sigmoid + multiply — cheap, bandwidth-light) onto every block
-output, and prefer depth over width when spending latency.
+Ablation of 4xNomosWebPhoto_RealPLKSR showed its quality lives in (a)
+per-pixel EA gating — removal is the most catastrophic single ablation,
+14.1 dB survival — and (b) collective depth, NOT in the 17px large kernels
+(1x1-cropped kernels survive at 29.6 dB). So: keep RTMoSR's fast
+small-kernel backbone, graft the teacher's EA gate (3x3 conv + sigmoid +
+multiply — cheap, bandwidth-light) onto every block output, and prefer
+depth over width when spending latency.
+
+Those figures are quoted from that run, whose output file is not in this
+repository and is not recoverable: the 2026-08-20 ablation predates the
+project's persistent storage, so neither its JSON nor the teacher checkpoint
+it loaded survives.
+
+`tools/ablate_teacher.py` is the harness that produced them, so the evidence
+is regenerable rather than lost. A re-run scores against today's validation
+corpus and would not reproduce these exact numbers, so it belongs to a
+future release rather than here, where it would silently revise figures the
+model card already publishes.
 """
 import torch
 from torch import Tensor, nn
