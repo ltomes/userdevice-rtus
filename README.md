@@ -214,6 +214,13 @@ Read it before releasing anything.
 
 Naming (`userdevice-rtus-<version>-<shape>`) is explained in [`docs/NAMING.md`](docs/NAMING.md).
 
+**The names are not covered by either licence.** MIT and CC BY-SA 4.0 are
+copyright licences and grant no rights in *userDevice* or *RTUS*. Referring to
+this project by name is free and encouraged — building on it, comparing
+against it, citing it. Naming *your* model, product or domain userDevice or
+RTUS, or publishing modified weights as an official release, is what needs
+asking. See [`TRADEMARK.md`](TRADEMARK.md).
+
 [`docs/MODEL-CARD.md`](docs/MODEL-CARD.md) is the card that ships with a
 weights release — it is uploaded as the model repository's `README.md`, and
 it carries the attributions above. Keep it versioned with the code that
