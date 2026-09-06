@@ -67,7 +67,13 @@ These come from the **same validation split every number on this page was
 measured on**, so the pictures and the table describe the same data. The
 teacher column is the interesting one for a distilled model: it produces
 excellent results and **cannot hit the frame budget**, which is the whole
-point of the student. Read left to right, the gap between column 2 and column
+point of the student. Measured on the same device, the teacher takes
+**2447 ms for a 1080p input** against the 41.7 ms of a 24 fps frame — about
+59x over budget, and roughly 85x the student's 28.7 ms. It is 4x where the
+student is 2x, so it is doing more work per frame; correcting for output
+pixels the gap is nearer 20x. Either way it is not a deployment candidate,
+and that is why this model exists. Full figures and caveats in
+[`docs/BENCHMARKS.md`](https://github.com/ltomes/userdevice-rtus/blob/main/docs/BENCHMARKS.md). Read left to right, the gap between column 2 and column
 3 is what distillation cost, and the gap between column 1 and column 2 is what
 it bought.
 

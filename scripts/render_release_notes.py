@@ -130,6 +130,23 @@ def render(d: dict) -> str:
         f"{par['against']} (project threshold >{par['threshold_db']} dB).")
     add("")
 
+    # Optional. Releases before this block existed omit it, so re-rendering an
+    # older tag reproduces exactly what was published rather than silently
+    # growing a section.
+    cmp_ = d.get("comparison")
+    if cmp_:
+        add(f"## Against the teacher ({cmp_['name']})")
+        add("")
+        add("| Input | Teacher | RTUS | Speedup |")
+        add("|---|---|---|---|")
+        for row in cmp_["shapes"]:
+            add(f"| {row['input']} | {row['teacher_ms']:.1f} ms | "
+                f"{row['student_ms']:.3f} ms | **{row['speedup']:.0f}x** |")
+        add("")
+        for note in cmp_.get("caveats", []):
+            add(f"- {note}")
+        add("")
+
     add("## Weights")
     add("")
     add(f"The weights are **not attached to this release**. They are published "
