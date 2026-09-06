@@ -56,34 +56,40 @@ and has no published timings.**
 
 ## What it looks like
 
-Each panel is one frame, three ways: **bicubic** (what you get with no model
-at all), **RTUS 0.1.0**, and the **ground truth**. The bottom row is a 3×
-nearest-neighbour zoom on the busiest tile in the frame — at full-frame scale
-on a monitor, perceptual differences are invisible, which is how a lot of
-super-resolution comparisons get away with proving nothing.
+Each validation panel is one frame, four ways: **bicubic** (what you get with
+no model at all), **RTUS 0.1.0**, the **teacher** this model was distilled
+from, and the **ground truth**. The bottom row is a 3× nearest-neighbour zoom
+on the busiest tile in the frame — at full-frame scale on a monitor,
+perceptual differences are invisible, which is how a lot of super-resolution
+comparisons get away with proving nothing.
 
 These come from the **same validation split every number on this page was
 measured on**, so the pictures and the table describe the same data. The
-fourth column is the teacher this model was distilled from — it produces
+teacher column is the interesting one for a distilled model: it produces
 excellent results and **cannot hit the frame budget**, which is the whole
-point of the student.
+point of the student. Read left to right, the gap between column 2 and column
+3 is what distillation cost, and the gap between column 1 and column 2 is what
+it bought.
 
 ![Validation sample 1](samples/val/valsample-01.png)
 
 ![Validation sample 2](samples/val/valsample-02.png)
 
-![Validation sample 3](samples/val/valsample-03.png)
+![Validation sample 3](samples/val/valsample-04.png)
 
 ### On real video
 
 The validation split is still frames. Video is not, and a per-frame model
 can shimmer on motion while scoring well on every still-frame metric —
 which is why the temporal leg exists. These panels are frames from
-**Sintel**, degraded the same way, as a check on real footage:
+**Sintel**, degraded the same way, as a check on real footage. They are
+**three columns, not four** — bicubic, RTUS and ground truth — because the
+teacher was never run over this footage, and a column that did not exist is
+not one to invent:
 
-![Sintel sample 1](samples/sample-frame_01.png)
+![Sintel sample 1](samples/sample-frame_05.png)
 
-![Sintel sample 2](samples/sample-frame_03.png)
+![Sintel sample 2](samples/sample-frame_06.png)
 
 All panels are in [`samples/`](samples).
 
