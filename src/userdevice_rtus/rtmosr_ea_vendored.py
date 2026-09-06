@@ -16,7 +16,18 @@ from userdevice_rtus.rtmosr_vendored import RTMoSR, GatedCNNBlock
 
 
 class EA(nn.Module):
-    "Element-wise (per-pixel) attention gate, as in RealPLKSR."
+    """Element-wise (per-pixel) attention gate, taken from RealPLKSR.
+
+    The definition it was grafted from is vendored alongside this file, in
+    `realplksr_vendored.py` (see its `PLKBlock`), so the graft can be diffed
+    against its source. That module is reference only -- nothing imports it,
+    and the teacher itself is loaded through spandrel.
+
+    This gate is why the student exists in this shape: ablating the teacher
+    showed removing EA is its most catastrophic single ablation (14.1 dB
+    survival), while 1x1-cropping its 17px kernels survives at 29.6 dB. So
+    the student keeps the cheap small-kernel backbone and buys this instead.
+    """
 
     def __init__(self, dim: int) -> None:
         super().__init__()
