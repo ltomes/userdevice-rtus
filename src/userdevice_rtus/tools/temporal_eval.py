@@ -34,10 +34,10 @@ from PIL import Image
 from safetensors.torch import load_file
 
 from userdevice_rtus import build_tier
-from userdevice_rtus.paths import DATASETS, RESULTS
+from userdevice_rtus.paths import RESULTS, v2_dir
 
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-ROOT = str(DATASETS / "rtus2x_v2" / "val")
+ROOT = str(v2_dir() / "val")   # V2 only -- never fall through to V1
 MAXPAIRS = int(os.environ.get("MAXPAIRS", "120"))
 
 # Candidates to score: JSON mapping label -> {"path": <ckpt>, "arch": <tier>}.

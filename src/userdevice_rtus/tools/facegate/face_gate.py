@@ -36,6 +36,7 @@ GT_THRESH = 0.2   # lenient: what counts as "there was a face" in source
 IOU_MATCH = 0.3
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
 from userdevice_rtus.paths import SCRFD as _SCRFD
+from userdevice_rtus.paths import val_dirs
 
 # The detector is fetched by scripts/fetch_assets.sh into PRETRAINED, which is
 # also where rtus-info looks for it. It used to be read from inside the
@@ -43,8 +44,7 @@ from userdevice_rtus.paths import SCRFD as _SCRFD
 # ready while the gate itself could not find its own model.
 ONNX = str(_SCRFD)
 
-VAL_DIRS = [f"{_RTUS_ROOT}/datasets/rtus2x/val",
-            f"{_RTUS_ROOT}/datasets/rtus2x_v2/val"]
+VAL_DIRS = [str(d) for d in val_dirs()]
 OUT_DIR = f"{_RTUS_ROOT}/facegate/violations"
 
 

@@ -120,6 +120,57 @@ jobs:
           raise SystemExit(1 if bad else 0)
           PY
 
+      - name: The corpus resolves under BOTH of its names
+        # talos-cluster-1a20: the package renamed the corpus to rtus2x*, the
+        # data on odinson is still greyduck2x*. RTUS_DATA_ROOT made the ROOT
+        # configurable and left the NAME hardcoded, so pointing a Job at the
+        # real root resolved to a directory that does not exist -- and the
+        # tools then scored ZERO frames without failing. This asserts the
+        # legacy name resolves, and that an absent corpus stays absent.
+        run: |
+          python - <<'PY'
+          import os, sys, tempfile, importlib
+          from pathlib import Path
+
+          root = Path(tempfile.mkdtemp())
+          # A node that only ever had the OLD name -- i.e. odinson.
+          for sub in ("greyduck2x_v2/val/lr", "greyduck2x/val/lr"):
+              (root / "datasets" / sub).mkdir(parents=True)
+
+          os.environ["RTUS_DATA_ROOT"] = str(root)
+          sys.modules.pop("userdevice_rtus.paths", None)
+          paths = importlib.import_module("userdevice_rtus.paths")
+
+          bad = 0
+          def check(label, got, want):
+              global bad
+              ok = got == want
+              bad += 0 if ok else 1
+              print(f"{'ok  ' if ok else 'FAIL'} {label}: {got!r}")
+              if not ok:
+                  print(f"      expected {want!r}")
+
+          check("v2 resolves to the legacy name",
+                paths.v2_dir().name, "greyduck2x_v2")
+          check("v1 resolves to the legacy name",
+                paths.v1_dir().name, "greyduck2x")
+          check("VAL_SETS finds both, V2 first",
+                [p.parent.name for p in paths.VAL_SETS],
+                ["greyduck2x_v2", "greyduck2x"])
+          # Writes must NOT go to the legacy name -- new data takes the
+          # canonical one, so a generator and its readers agree.
+          check("PRIMARY_CORPUS is canonical", paths.PRIMARY_CORPUS, "rtus2x_v2")
+
+          # An absent corpus must resolve to NOTHING rather than to a
+          # plausible-looking path that silently yields zero frames.
+          os.environ["RTUS_DATA_ROOT"] = str(root / "nope")
+          sys.modules.pop("userdevice_rtus.paths", None)
+          paths = importlib.import_module("userdevice_rtus.paths")
+          check("absent corpus finds no real dirs", paths.corpus_dirs(), [])
+
+          raise SystemExit(1 if bad else 0)
+          PY
+
       - name: Configs ship INSIDE the wheel
         # Shipping configs in the package is deliberate: copying one onto a
         # node by hand is how a config in this project's history became

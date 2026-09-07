@@ -33,12 +33,13 @@ from traiNNer.losses.dists_loss import DISTSLoss
 from traiNNer.metrics.psnr_ssim import calculate_psnr, calculate_ssim
 from traiNNer.utils.img_util import img2batchedtensor
 
-from userdevice_rtus.paths import DATASETS
+from userdevice_rtus.paths import corpus_dirs
 
 # Metrics come from traiNNer's own registry implementations so they stay
 # directly comparable to the figures printed during training.
-VAL_SETS = [(str(DATASETS / "rtus2x_v2"), "rtus2x_v2"),
-            (str(DATASETS / "rtus2x"), "rtus2x")]
+# Label with the RESOLVED directory name so a report says which corpus it
+# actually scored, not which one the source hoped for.
+VAL_SETS = [(str(d), d.name) for d in corpus_dirs()]
 CROP_BORDER = 2
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

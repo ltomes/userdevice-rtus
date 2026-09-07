@@ -23,8 +23,10 @@ import torch
 from PIL import Image, ImageDraw
 
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+from userdevice_rtus.paths import corpus_dirs
 
-VAL_SETS = [f"{_RTUS_ROOT}/datasets/rtus2x_v2", f"{_RTUS_ROOT}/datasets/rtus2x"]
+# Resolved, not hardcoded: the same corpus is named greyduck2x* on odinson.
+VAL_SETS = [str(d) for d in corpus_dirs()]
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ZOOM = 3
 TILE = 96          # crop size in GT pixels before zoom

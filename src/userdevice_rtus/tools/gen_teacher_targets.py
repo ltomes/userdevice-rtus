@@ -19,9 +19,10 @@ from PIL import Image
 from spandrel import ModelLoader
 
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+from userdevice_rtus.paths import v1_dir
 
 BASE = f"{_RTUS_ROOT}"
-DATASET = sys.argv[1] if len(sys.argv) > 1 else "rtus2x"
+DATASET = sys.argv[1] if len(sys.argv) > 1 else v1_dir().name
 TEACHER = os.path.join(BASE, "pretrained/teacher_4xNomosWebPhoto_RealPLKSR.safetensors")
 
 model = ModelLoader().load_from_file(TEACHER).model.eval().cuda().half()

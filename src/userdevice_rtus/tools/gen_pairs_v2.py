@@ -29,9 +29,10 @@ import numpy as np
 from PIL import Image
 
 from userdevice_rtus.paths import DATA_ROOT as _RTUS_ROOT
+from userdevice_rtus.paths import PRIMARY_CORPUS
 
 SRC = f"{_RTUS_ROOT}/datasets/nomosrealweb/hr"
-OUT = f"{_RTUS_ROOT}/datasets/rtus2x_v2"
+OUT = f"{_RTUS_ROOT}/datasets/{PRIMARY_CORPUS}"
 TMP = "/tmp/clip"
 WIN, N_HARVEST = 480, 6
 KERNELS = [Image.BICUBIC, Image.BILINEAR, Image.LANCZOS, Image.BOX]
