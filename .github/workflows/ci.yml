@@ -21,7 +21,14 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    # main, plus every release-semver staging branch. Operator, 2026-09-11:
+    # "push WIP to the release-semver branch on userdevice-rtus, never
+    # origin/main. Make that the convention." CI vets on push, so a staging
+    # branch the trigger does not match is a branch nobody vets -- which is
+    # the circularity this convention exists to break.
+    branches:
+      - main
+      - '[0-9]*.[0-9]*.[0-9]*'
   pull_request:
   workflow_dispatch:
 
