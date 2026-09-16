@@ -1,6 +1,7 @@
 """userDevice RTUS — real-time 2x upscaling.
 
-Importing this package registers the RTUS architectures with traiNNer (when
+Importing this package registers the RTUS architectures -- and the block-grid
+loss (`blockgrid_loss`) -- with traiNNer (when
 traiNNer is installed), so `network_g: {type: rtmosr_ea_film}` in a config
 resolves. See `_registry` for why that is not automatic.
 """
@@ -10,6 +11,7 @@ from userdevice_rtus._registry import (
     USING_REAL_REGISTRY,
     require_real_registry,
 )
+from userdevice_rtus.blockgrid_loss import BlockGridLoss
 from userdevice_rtus.rtmosr_ea_vendored import RTMoSREA
 from userdevice_rtus.rtmosr_vendored import RTMoSR
 
@@ -17,6 +19,7 @@ __all__ = [
     "ARCH_REGISTRY",
     "USING_REAL_REGISTRY",
     "require_real_registry",
+    "BlockGridLoss",
     "RTMoSR",
     "RTMoSREA",
     "TIERS",
